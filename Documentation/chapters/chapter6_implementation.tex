@@ -1,0 +1,356 @@
+\chapter{Implementation}
+
+\section{Project Structure}
+
+\begin{verbatim}
+hand-sign/
+├── app.py                          # CLI application
+├── enhanced_dashboard.py           # Streamlit web interface
+├── gesture_config.json             # Configuration file
+├── requirements.txt                # Python dependencies
+├── model/
+│   ├── __init__.py
+│   ├── hand_landmarker.task       # MediaPipe model
+│   ├── keypoint_classifier/
+│   │   ├── keypoint_classifier.py
+│   │   ├── keypoint_classifier.hdf5     # Trained model
+│   │   ├── keypoint_classifier.tflite   # Optimized model
+│   │   ├── keypoint_classifier_label.csv
+│   │   └── keypoint.csv            # Training data
+│   └── point_history_classifier/
+│       ├── point_history_classifier.py
+│       ├── point_history_classifier.hdf5
+│       ├── point_history_classifier.tflite
+│       ├── point_history_classifier_label.csv
+│       └── point_history.csv
+├── utils/
+│   ├── __init__.py
+│   └── cvfpscalc.py               # FPS calculator
+├── training_data/
+│   ├── hello/                      # 100 gesture images
+│   │   ├── hello_0001.jpg
+│   │   ├── hello_0002.jpg
+│   │   └── ... (100 images)
+│   └── thumbsup/                   # 100 gesture images
+│       ├── thumbsup_0001.jpg
+│       └── ... (100 images)
+└── trained_models/                 # Saved trained models
+\end{verbatim}
+
+\section{Core Implementation Components}
+
+\subsection{Hand Landmarker Integration}
+
+The system uses MediaPipe Hand Landmarker for robust hand detection:
+
+\begin{lstlisting}[language=Python]
+import os
+import urllib.request
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
+
+# Download model if not present
+model_path = 'model/hand_landmarker.task'
+if not os.path.exists(model_path):
+    os.makedirs(os.path.dirname(model_path), exist_ok=True)
+    url = "https://storage.googleapis.com/mediapipe-models/"
+    url += "hand_landmarker/hand_landmarker/float16/1/"
+    url += "hand_landmarker.task"
+    urllib.request.urlretrieve(url, model_path)
+
+# Configure for dual-hand detection
+base_options = python.BaseOptions(model_asset_path=model_path)
+options = vision.HandLandmarkerOptions(
+    base_options=base_options,
+    num_hands=2,  # Changed from 1 to 2
+    min_hand_detection_confidence=0.7,
+    min_tracking_confidence=0.5,
+    running_mode=vision.RunningMode.VIDEO
+)
+hands = vision.HandLandmarker.create_from_options(options)
+\end{lstlisting}
+
+\subsection{Gesture Classifier Implementation}
+
+\begin{lstlisting}[language=Python]
+class KeyPointClassifier:
+    def __init__(self, model_path='model/keypoint_classifier/'
+                           'keypoint_classifier.tflite'):
+        self.interpreter = tf.lite.Interpreter(
+            model_path=model_path)
+        self.interpreter.allocate_tensors()
+        
+        self.input_details = self.interpreter.get_input_details()
+        self.output_details = self.interpreter.get_output_details()
+
+    def __call__(self, landmark_list):
+        input_data = np.array(
+            [landmark_list], dtype=np.float32)
+        
+        self.interpreter.set_tensor(
+            self.input_details[0]['index'], input_data)
+        self.interpreter.invoke()
+        
+        output_data = self.interpreter.get_tensor(
+            self.output_details[0]['index'])
+        
+        return np.argmax(output_data[0])
+\end{lstlisting}
+
+\subsection{Training Data Collection}
+
+Implemented in Streamlit dashboard:
+
+\begin{lstlisting}[language=Python]
+def train_mode():
+    st.header("📚 Train New Gesture")
+    
+    gesture_name_input = st.text_input(
+        "Enter gesture name:", placeholder="e.g., hello")
+    
+    if st.button("▶️ Start Capturing"):
+        cap = cv.VideoCapture(0, cv.CAP_DSHOW)
+        cap.set(cv.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv.CAP_PROP_FRAME_HEIGHT, 480)
+        
+        image_count = 0
+        gesture_dir = f"training_data/{gesture_name_input}"
+        os.makedirs(gesture_dir, exist_ok=True)
+        
+        while True:
+            ret, frame = cap.read()
+            if not ret:
+                break
+            
+            # Hand detection and capture
+            results = hand_detector.detect_hands(frame)
+            if results and results.get('area', 0) > min_area:
+                # Save image
+                filename = f"{gesture_dir}/{gesture_name_input}" + \
+                          f"_{image_count:04d}.jpg"
+                cv.imwrite(filename, frame)
+                image_count += 1
+        
+        cap.release()
+\end{lstlisting}
+
+\section{Streamlit Dashboard Features}
+
+\subsection{Mode Selection}
+
+\begin{lstlisting}[language=Python]
+mode = st.sidebar.radio(
+    "Select Mode",
+    ["📚 Train New Gesture", 
+     "🔍 Test & Recognize", 
+     "⌨️ Type Mode",
+     "📊 View Training Data"],
+    index=0
+)
+
+if mode == "📚 Train New Gesture":
+    train_mode()
+elif mode == "🔍 Test & Recognize":
+    test_mode()
+elif mode == "⌨️ Type Mode":
+    typing_mode()
+elif mode == "📊 View Training Data":
+    view_data_mode()
+\end{lstlisting}
+
+\subsection{Type Mode Implementation}
+
+\begin{lstlisting}[language=Python]
+def typing_mode():
+    # Character mapping setup
+    if 'gesture_to_char' not in st.session_state:
+        st.session_state.gesture_to_char = {
+            gesture: gesture[0].upper() 
+            for gesture in get_gesture_list()
+        }
+    
+    # Live recognition loop
+    if run_typing:
+        last_gesture = None
+        gesture_hold_count = 0
+        
+        while run_typing:
+            ret, frame = cap.read()
+            # ... hand detection ...
+            
+            if detected_gesture == last_gesture:
+                gesture_hold_count += 1
+                if gesture_hold_count >= threshold:
+                    # Add character
+                    char = st.session_state.gesture_to_char[
+                        detected_gesture]
+                    st.session_state.typed_text += char
+                    
+                    # Auto-speak if enabled
+                    if auto_speak:
+                        speak_text(char)
+\end{lstlisting}
+
+\subsection{Text-to-Speech Integration}
+
+\begin{lstlisting}[language=Python]
+def speak_text(text):
+    """Speak text in background thread"""
+    def _speak():
+        try:
+            engine = pyttsx3.init()
+            engine.setProperty('rate', 150)
+            engine.say(text)
+            engine.runAndWait()
+            engine.stop()
+        except Exception:
+            pass
+    
+    thread = threading.Thread(target=_speak, daemon=True)
+    thread.start()
+
+# Usage in typing mode
+if st.button("🔊 Speak"):
+    if st.session_state.typed_text:
+        speak_text(st.session_state.typed_text)
+\end{lstlisting}
+
+\section{Model Training}
+
+\subsection{Training Process}
+
+\begin{lstlisting}[language=Python]
+# Load and preprocess data
+X_train, y_train = load_training_data('training_data/')
+
+# Normalize labels
+y_train_categorical = tf.keras.utils.to_categorical(
+    y_train, num_classes=num_gestures)
+
+# Build model
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(42,)),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(64, activation='relu'),
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(num_gestures, activation='softmax')
+])
+
+# Compile and train
+model.compile(
+    optimizer='adam',
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+
+history = model.fit(
+    X_train, y_train_categorical,
+    epochs=50,
+    batch_size=32,
+    validation_split=0.2,
+    verbose=1
+)
+
+# Save models
+model.save('model/keypoint_classifier/keypoint_classifier.hdf5')
+converter = tf.lite.TFLiteConverter.from_keras_model(model)
+tflite_model = converter.convert()
+with open('model/keypoint_classifier/keypoint_classifier.tflite',
+          'wb') as f:
+    f.write(tflite_model)
+\end{lstlisting}
+
+\section{Dependencies and Requirements}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Package} & \textbf{Version/Purpose} \\
+\hline
+tensorflow & Deep learning framework \\
+\hline
+mediapipe & Hand detection and pose \\
+\hline
+opencv-python & Computer vision operations \\
+\hline
+streamlit & Web dashboard framework \\
+\hline
+numpy & Numerical computations \\
+\hline
+pandas & Data manipulation \\
+\hline
+pyttsx3 & Text-to-speech synthesis \\
+\hline
+scikit-learn & Machine learning utilities \\
+\hline
+pillow & Image processing \\
+\hline
+\end{tabular}
+\caption{Project Dependencies}
+\end{table}
+
+\section{Installation Steps}
+
+\begin{lstlisting}[language=bash]
+# 1. Clone/download project
+cd hand-sign
+
+# 2. Create virtual environment
+python -m venv .venv
+.venv\Scripts\activate  # Windows
+source .venv/bin/activate  # Unix
+
+# 3. Install requirements
+pip install -r requirements.txt
+
+# 4. Run Streamlit dashboard
+streamlit run enhanced_dashboard.py
+
+# 5. Open browser
+# http://localhost:8501
+\end{lstlisting}
+
+\section{Configuration Files}
+
+\subsection{gesture\_config.json}
+
+Stores metadata about trained gestures:
+
+\begin{lstlisting}[language=json]
+{
+  "hello": {
+    "created": "2026-02-04T16:45:47.678859",
+    "description": "Gesture: hello",
+    "last_updated": "2026-02-04T16:45:47.678874",
+    "image_count": 100
+  },
+  "thumbsup": {
+    "created": "2026-02-03T21:59:26.181129",
+    "description": "Gesture: thumbsup",
+    "last_updated": "2026-02-04T16:39:54.290607",
+    "image_count": 100
+  }
+}
+\end{lstlisting}
+
+\section{Performance Optimizations}
+
+\subsection{Real-Time Processing}
+
+\begin{enumerate}
+    \item \textbf{GPU Acceleration}: TensorFlow uses GPU if available
+    \item \textbf{Model Quantization}: TFLite models are quantized for speed
+    \item \textbf{Threading}: Non-blocking operations (speech synthesis)
+    \item \textbf{Caching}: Streamlit caches MediaPipe models
+    \item \textbf{Efficient Preprocessing}: Vectorized NumPy operations
+\end{enumerate}
+
+\subsection{Memory Management}
+
+\begin{itemize}
+    \item Deque with fixed maximum length for point history
+    \item Image buffering in video capture
+    \item Session state for Streamlit persistence
+\end{itemize}

@@ -1,0 +1,466 @@
+\chapter{System Pipeline and Dataset Creation}
+
+This chapter provides a detailed explanation of the complete system pipeline and the custom dataset creation process due to the lack of publicly available ISL datasets.
+
+\section{Dataset Challenge and Custom Solution}
+
+\subsection{Problem: Dataset Unavailability}
+
+The primary challenge faced during project development was the \textbf{unavailability of publicly available Indian Sign Language (ISL) datasets}. Publicly available sign language datasets are typically:
+
+\begin{itemize}
+    \item Limited to American Sign Language (ASL) or other international sign languages
+    \item Restricted by licensing agreements
+    \item Not freely accessible for commercial or research use
+    \item Insufficient for training robust models
+    \item Not tailored to specific recognition requirements
+\end{itemize}
+
+ISL-specific challenges:
+\begin{itemize}
+    \item Linguistic differences from ASL and other sign languages
+    \item Region-specific gesture variations
+    \item Limited online resources for ISL
+    \item Lack of standardized ISL gesture libraries
+\end{itemize}
+
+\subsection{Solution: Custom Dataset Creation}
+
+To overcome this challenge, we implemented a comprehensive custom dataset creation pipeline within the Streamlit dashboard:
+
+\subsubsection{Dataset Collection Process}
+
+\begin{enumerate}
+    \item \textbf{Gesture Definition}: Define specific gestures to recognize (hello, thumbsup, etc.)
+    \item \textbf{Training Mode}: Use dashboard training interface to capture images
+    \item \textbf{Data Collection}: Capture 100+ images per gesture from multiple angles
+    \item \textbf{Data Augmentation}: Vary lighting, distance, and hand position
+    \item \textbf{Labeling}: Automatic labeling through directory organization
+    \item \textbf{Validation}: Manual verification of collected data
+\end{enumerate}
+
+\subsubsection{Custom Dataset Statistics}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Gesture} & \textbf{Images} & \textbf{Collection Date} & \textbf{Resolution} \\
+\hline
+Hello & 100 & 2026-02-04 & 640x480 \\
+\hline
+Thumbs Up & 100 & 2026-02-04 & 640x480 \\
+\hline
+Total & 200 & - & - \\
+\hline
+\end{tabular}
+\caption{Custom ISL Training Dataset Summary}
+\end{table}
+
+\subsubsection{Data Collection Methodology}
+
+\paragraph{Environment Setup}
+\begin{itemize}
+    \item Varied lighting conditions (natural, artificial, mixed)
+    \item Different backgrounds (solid color, complex patterns)
+    \item Multiple distances from camera (30cm to 100cm)
+    \item Various hand positions within frame
+\end{itemize}
+
+\paragraph{Image Characteristics}
+\begin{itemize}
+    \item Resolution: 640×480 pixels
+    \item Format: JPEG
+    \item Color space: BGR (as captured by OpenCV)
+    \item Frame rate: 30 FPS capture
+    \item Total variety: 200+ unique samples
+\end{itemize}
+
+\section{Complete System Pipeline}
+
+The system pipeline consists of 7 major stages:
+
+\subsection{Stage 1: Video Input and Preprocessing}
+
+\paragraph{Input Layer}
+\begin{itemize}
+    \item Capture from webcam (can also process video files)
+    \item Resolution: 640×480 pixels at 30 FPS
+    \item Color format: BGR (OpenCV standard)
+\end{itemize}
+
+\paragraph{Preprocessing}
+\begin{lstlisting}[language=Python]
+# Flip image for mirror effect
+image = cv.flip(image, 1)
+
+# Convert BGR to RGB for MediaPipe
+image_rgb = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+
+# Create MediaPipe image
+mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=image_rgb)
+\end{lstlisting}
+
+\paragraph{Output}
+\begin{itemize}
+    \item Normalized RGB image (0-1 range)
+    \item Timestamp in milliseconds for video mode
+\end{itemize}
+
+\subsection{Stage 2: Hand Landmark Detection (MediaPipe)}
+
+\paragraph{Hand Detection Configuration}
+\begin{lstlisting}[language=Python]
+options = vision.HandLandmarkerOptions(
+    base_options=base_options,
+    num_hands=2,                              # Support dual-hand
+    min_hand_detection_confidence=0.7,        # Detection threshold
+    min_tracking_confidence=0.5,              # Tracking threshold
+    running_mode=vision.RunningMode.VIDEO
+)
+hands = vision.HandLandmarker.create_from_options(options)
+\end{lstlisting}
+
+\paragraph{Landmark Structure}
+
+MediaPipe provides 21 hand landmarks per hand:
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Index} & \textbf{Landmark} & \textbf{Position} \\
+\hline
+0 & Wrist & Base of hand \\
+\hline
+1-4 & Thumb & Base, middle, interphalangeal, tip \\
+\hline
+5-8 & Index & Base, PIP, DIP, tip \\
+\hline
+9-12 & Middle & Base, PIP, DIP, tip \\
+\hline
+13-16 & Ring & Base, PIP, DIP, tip \\
+\hline
+17-20 & Pinky & Base, PIP, DIP, tip \\
+\hline
+\end{tabular}
+\caption{MediaPipe Hand Landmarks (21 points per hand)}
+\end{table}
+
+\paragraph{Output}
+\begin{itemize}
+    \item 21 landmarks per hand (x, y, z coordinates)
+    \item Confidence scores (0-1)
+    \item Handedness (LEFT/RIGHT)
+    \item Detection results for multiple hands
+\end{itemize}
+
+\subsection{Stage 3: Landmark Preprocessing}
+
+\paragraph{Normalization Process}
+
+The raw landmarks require preprocessing before classification:
+
+\begin{lstlisting}[language=Python]
+def calc_landmark_list(image, landmarks):
+    """Convert normalized coordinates to pixel values"""
+    image_width, image_height = image.shape[1], image.shape[0]
+    landmark_point = []
+    for landmark in landmarks.landmark:
+        landmark_x = min(int(landmark.x * image_width), 
+                        image_width - 1)
+        landmark_y = min(int(landmark.y * image_height), 
+                        image_height - 1)
+        landmark_point.append([landmark_x, landmark_y])
+    return landmark_point
+
+def pre_process_landmark(landmark_list):
+    """Normalize landmarks to 0-1 range"""
+    temp_landmark_list = copy.deepcopy(landmark_list)
+    base_x, base_y = temp_landmark_list[0][0], temp_landmark_list[0][1]
+    
+    # Center on wrist (landmark 0)
+    for i, point in enumerate(temp_landmark_list):
+        temp_landmark_list[i][0] -= base_x
+        temp_landmark_list[i][1] -= base_y
+    
+    # Flatten to 1D array (42 values = 21 landmarks × 2)
+    temp_landmark_list = list(itertools.chain.from_iterable(
+        temp_landmark_list))
+    
+    # Normalize by maximum absolute value
+    max_value = max(list(map(abs, temp_landmark_list)))
+    if max_value == 0:
+        return temp_landmark_list
+    
+    normalized = [n / max_value for n in temp_landmark_list]
+    return normalized
+\end{lstlisting}
+
+\paragraph{Preprocessing Strategy}
+\begin{enumerate}
+    \item \textbf{Wrist Centering}: Translate all points so wrist (index 0) is at origin
+    \item \textbf{Flattening}: Convert 21 (x,y) pairs into 42-element vector
+    \item \textbf{Normalization}: Divide by maximum value to scale to [-1, 1]
+    \item \textbf{Invariance}: Makes gesture recognition scale and position invariant
+\end{enumerate}
+
+\subsection{Stage 4: Gesture Classification}
+
+\paragraph{Keypoint Classifier Architecture}
+
+\begin{lstlisting}[language=Python]
+model = tf.keras.Sequential([
+    tf.keras.layers.Input(shape=(42,)),              # 21 landmarks × 2
+    tf.keras.layers.Dense(128, activation='relu'),   # Hidden layer 1
+    tf.keras.layers.Dropout(0.2),                    # Regularization
+    tf.keras.layers.Dense(64, activation='relu'),    # Hidden layer 2
+    tf.keras.layers.Dropout(0.2),
+    tf.keras.layers.Dense(num_classes, 
+                         activation='softmax')        # Output layer
+])
+
+model.compile(
+    optimizer=tf.keras.optimizers.Adam(learning_rate=0.001),
+    loss='categorical_crossentropy',
+    metrics=['accuracy']
+)
+\end{lstlisting}
+
+\paragraph{Classification Process}
+
+\begin{enumerate}
+    \item Preprocessed landmarks (42 values) → Input layer
+    \item Dense layer 1: 42 → 128 neurons with ReLU activation
+    \item Dropout: Random 20\% deactivation to prevent overfitting
+    \item Dense layer 2: 128 → 64 neurons with ReLU activation
+    \item Dropout: 20\% to improve generalization
+    \item Output layer: 64 → Number of gesture classes with Softmax
+    \item Result: Probability distribution over gestures
+\end{enumerate}
+
+\paragraph{Decision Making}
+\begin{lstlisting}[language=Python]
+hand_sign_id = keypoint_classifier(pre_processed_landmark_list)
+hand_sign_text = keypoint_classifier_labels[hand_sign_id]
+confidence = max(classifier_output)
+
+# Only accept if confidence > threshold
+if confidence > 0.7:
+    process_gesture(hand_sign_text)
+\end{lstlisting}
+
+\subsection{Stage 5: Point History Analysis (Complex Gestures)}
+
+\paragraph{Purpose}
+
+Recognize gestures involving motion (swipes, circles) using trajectory history:
+
+\begin{lstlisting}[language=Python]
+# Track finger tip (landmark 8 - index finger tip)
+if hand_sign_id == 2:  # Point gesture
+    point_history.append(landmark_list[8])
+else:
+    point_history.append([0, 0])
+
+# Maintain history of last 16 frames
+point_history = deque(maxlen=16)
+\end{lstlisting}
+
+\paragraph{Point History Preprocessing}
+\begin{lstlisting}[language=Python]
+def pre_process_point_history(image, point_history):
+    """Normalize trajectory data"""
+    image_width, image_height = image.shape[1], image.shape[0]
+    temp_point_history = copy.deepcopy(point_history)
+    
+    base_x, base_y = temp_point_history[0][0], temp_point_history[0][1]
+    
+    for i, point in enumerate(temp_point_history):
+        # Normalize by image dimensions
+        temp_point_history[i][0] = (temp_point_history[i][0] - 
+                                    base_x) / image_width
+        temp_point_history[i][1] = (temp_point_history[i][1] - 
+                                    base_y) / image_height
+    
+    # Flatten to 1D (32 values = 16 points × 2)
+    temp_point_history = list(itertools.chain.from_iterable(
+        temp_point_history))
+    
+    return temp_point_history
+\end{lstlisting}
+
+\paragraph{Output}
+\begin{itemize}
+    \item 32-element feature vector (16 frames × 2 coordinates)
+    \item Trajectory-based gesture classification
+    \item Used for detecting motion-based gestures
+\end{itemize}
+
+\subsection{Stage 6: Text Output Generation}
+
+\paragraph{Label Lookup}
+\begin{lstlisting}[language=Python]
+with open('model/keypoint_classifier/keypoint_classifier_label.csv',
+          encoding='utf-8-sig') as f:
+    keypoint_classifier_labels = [row[0] for row in csv.reader(f)]
+
+# Get text from prediction
+gesture_id = keypoint_classifier(preprocessed_landmarks)
+gesture_text = keypoint_classifier_labels[gesture_id]
+\end{lstlisting}
+
+\paragraph{Output Management}
+\begin{itemize}
+    \item Gesture text stored in variable
+    \item Confidence score calculated
+    \item Duplicate detection (skip if same as last)
+    \item CSV logging for training data collection
+\end{itemize}
+
+\subsection{Stage 7: Speech Synthesis and Display}
+
+\paragraph{Text-to-Speech Conversion}
+\begin{lstlisting}[language=Python]
+class SpeechEngine:
+    def __init__(self):
+        self._queue = queue.Queue()
+        self._thread = threading.Thread(target=self._run, daemon=True)
+        self._thread.start()
+
+    def _run(self):
+        engine = pyttsx3.init()
+        while True:
+            text = self._queue.get()
+            if text is None:
+                break
+            engine.say(text)
+            engine.runAndWait()
+
+    def say(self, text: str):
+        if text and pyttsx3 is not None:
+            self._queue.put(text)
+
+# Usage
+speaker = SpeechEngine()
+speaker.say("Hello")  # Non-blocking speech synthesis
+\end{lstlisting}
+
+\paragraph{Display Output}
+\begin{lstlisting}[language=Python]
+def draw_info_text(image, brect, handedness, hand_sign_text, 
+                   finger_gesture_text):
+    """Draw on image: hand type, gesture, finger gesture"""
+    cv.rectangle(image, (brect[0], brect[1]), 
+                 (brect[2], brect[1] - 22), (0, 0, 0), -1)
+    
+    info_text = handedness.classification[0].label[0:]
+    if hand_sign_text != "":
+        info_text = info_text + ':' + hand_sign_text
+    
+    cv.putText(image, info_text, (brect[0] + 5, brect[1] - 4),
+               cv.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1)
+    
+    return image
+\end{lstlisting}
+
+\section{Pipeline Flow Diagram}
+
+\paragraph{Complete Data Flow}
+
+\begin{verbatim}
+┌──────────────────┐
+│  Video Capture   │ (640×480, 30 FPS)
+│   (Webcam)       │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│  Preprocessing   │ (Flip, BGR→RGB, normalize)
+│  (OpenCV)        │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│ Hand Detection   │ (21 landmarks per hand)
+│   (MediaPipe)    │
+└────────┬─────────┘
+         │
+         ▼
+┌──────────────────┐
+│ Landmark         │ (Normalize, flatten to 42 values)
+│ Preprocessing    │
+└────────┬─────────┘
+         │
+    ┌────┴────┐
+    │          │
+    ▼          ▼
+┌────────┐ ┌──────────────┐
+│Keypoint│ │Point History │
+│ Classify.│ │  Buffer      │
+│(CNN)   │ │(16 frames)   │
+└────┬───┘ └──────┬───────┘
+     │             │
+     └─────┬───────┘
+           │
+           ▼
+    ┌────────────────┐
+    │ Label Lookup   │ (Get gesture name)
+    └────────┬───────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │ Text Output     │ (Display + CSV log)
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │Text-to-Speech   │ (pyttsx3, threading)
+    │Engine           │
+    └────────┬────────┘
+             │
+             ▼
+    ┌─────────────────┐
+    │ Display Results │ (UI, landmarks, speech)
+    │ (OpenCV/Streamlit)│
+    └─────────────────┘
+\end{verbatim}
+
+\section{Key Pipeline Features}
+
+\subsection{Dual-Hand Support}
+
+Changed configuration from single to dual-hand recognition:
+\begin{lstlisting}[language=Python]
+# Before: num_hands=1
+# After:  num_hands=2
+
+options = vision.HandLandmarkerOptions(
+    num_hands=2,  # Support both hands simultaneously
+    ...
+)
+\end{lstlisting}
+
+Each hand is processed independently through the complete pipeline.
+
+\subsection{Real-Time Processing}
+
+Pipeline optimizations for real-time operation:
+\begin{itemize}
+    \item FPS calculation and monitoring
+    \item Video mode for temporal consistency
+    \item Threading for non-blocking operations
+    \item Efficient numpy operations for mathematics
+\end{itemize}
+
+\subsection{Data Augmentation}
+
+During dataset collection, automatically achieved through:
+\begin{itemize}
+    \item Varying hand distances from camera
+    \item Different lighting conditions
+    \item Multiple hand positions in frame
+    \item Both hands and hand angles
+\end{itemize}
+
+This natural augmentation ensures robustness without explicit transformation functions.

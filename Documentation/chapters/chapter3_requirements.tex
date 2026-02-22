@@ -1,0 +1,188 @@
+\chapter{Requirements and Analysis}
+
+\section{Problem Definition}
+
+\subsection{Challenge}
+
+Hearing-impaired individuals face significant communication barriers in daily life due to:
+\begin{enumerate}
+    \item Limited number of sign language interpreters
+    \item General population lacks sign language proficiency
+    \item Communication gaps in education, healthcare, and public services
+    \item Lack of accessible assistive technology solutions
+\end{enumerate}
+
+\subsection{Solution Approach}
+
+Develop an automated system that:
+\begin{itemize}
+    \item Recognizes Indian Sign Language gestures in real-time
+    \item Converts gestures to text and speech output
+    \item Operates without requiring human interpreters
+    \item Is accessible and easy to use
+    \item Can be deployed on standard computers with webcams
+\end{itemize}
+
+\section{Requirements Specification}
+
+\subsection{Functional Requirements}
+
+\begin{enumerate}
+    \item \textbf{Hand Detection}: Real-time detection of one or more hands in video feed
+    \item \textbf{Gesture Classification}: Accurate classification of recognized gestures
+    \item \textbf{Text Conversion}: Convert recognized gestures to text output
+    \item \textbf{Speech Synthesis}: Convert text to speech using text-to-speech engine
+    \item \textbf{Training Interface}: Dashboard for collecting and labeling training data
+    \item \textbf{Testing Interface}: Real-time gesture recognition testing
+    \item \textbf{Typing Mode}: Use gestures to type characters with text-to-speech
+    \item \textbf{Data Management}: Store and manage training datasets
+    \item \textbf{Model Management}: Save and load trained models
+\end{enumerate}
+
+\subsection{Non-Functional Requirements}
+
+\begin{enumerate}
+    \item \textbf{Performance}: Real-time processing at 30+ FPS
+    \item \textbf{Accuracy}: Achieve >85\% accuracy for trained gestures
+    \item \textbf{Reliability}: Consistent performance across lighting conditions
+    \item \textbf{Usability}: Intuitive interface for non-technical users
+    \item \textbf{Portability}: Cross-platform support (Windows, Linux, macOS)
+    \item \textbf{Scalability}: Support for adding new gestures without retraining all models
+    \item \textbf{Robustness}: Handle multiple hand distances and angles
+\end{enumerate}
+
+\section{Planning and Scheduling}
+
+\subsection{Project Phases}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Phase} & \textbf{Duration} & \textbf{Deliverables} \\
+\hline
+Analysis & Week 1-2 & Requirements, Design Documents \\
+\hline
+Development & Week 3-6 & Core System Implementation \\
+\hline
+Dataset Creation & Week 4-5 & Training Data Collection \\
+\hline
+Model Training & Week 5-6 & Trained Models \\
+\hline
+Testing & Week 7 & Test Results, Bug Fixes \\
+\hline
+Integration & Week 7 & Dashboard Integration \\
+\hline
+Documentation & Week 8 & Final Report, User Guide \\
+\hline
+\end{tabular}
+\caption{Project Timeline}
+\end{table}
+
+\section{Software and Hardware Requirements}
+
+\subsection{Software Requirements}
+
+\begin{itemize}
+    \item \textbf{Operating System}: Windows 10+, Ubuntu 18.04+, or macOS 10.13+
+    \item \textbf{Python}: Version 3.8 or higher
+    \item \textbf{Package Manager}: pip or conda
+    \item \textbf{IDE}: Visual Studio Code or PyCharm
+\end{itemize}
+
+\subsection{Hardware Requirements}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Component} & \textbf{Specification} \\
+\hline
+Processor & Intel i5/AMD Ryzen 5 or better \\
+\hline
+RAM & Minimum 4GB, Recommended 8GB+ \\
+\hline
+Storage & 2GB free space for dependencies \\
+\hline
+Webcam & 640x480 resolution minimum \\
+\hline
+\end{tabular}
+\caption{Hardware Specifications}
+\end{table}
+
+\section{Preliminary Product Description}
+
+The Indian Sign Language (ISL) Detection System is a desktop application consisting of:
+
+\begin{enumerate}
+    \item \textbf{Core Engine}
+    \begin{itemize}
+        \item Hand landmark detection using MediaPipe
+        \item Gesture classification using CNN models
+        \item Point history tracking for complex gestures
+    \end{itemize}
+    
+    \item \textbf{User Interface}
+    \begin{itemize}
+        \item Streamlit-based web dashboard
+        \item Command-line interface (optional)
+        \item Real-time video preview
+    \end{itemize}
+    
+    \item \textbf{Data Management}
+    \begin{itemize}
+        \item Training data collection and storage
+        \item Model serialization and loading
+        \item Configuration management
+    \end{itemize}
+    
+    \item \textbf{Output Generation}
+    \begin{itemize}
+        \item Text output of recognized gestures
+        \item Speech synthesis using pyttsx3
+        \item Gesture-to-character mapping
+    \end{itemize}
+\end{enumerate}
+
+\section{Feasibility Study}
+
+\subsection{Technical Feasibility}
+
+\begin{itemize}
+    \item \textbf{Positive Factors}
+    \begin{itemize}
+        \item MediaPipe provides robust hand detection
+        \item TensorFlow/Keras enable fast model development
+        \item Streamlit simplifies UI development
+        \item Python ecosystem is mature and well-supported
+    \end{itemize}
+    
+    \item \textbf{Challenges}
+    \begin{itemize}
+        \item Real-time processing requires optimization
+        \item Limited availability of ISL datasets
+        \item Complex hand gestures with similar features
+    \end{itemize}
+\end{itemize}
+
+\subsection{Economic Feasibility}
+
+\begin{itemize}
+    \item All tools and libraries are open-source (zero licensing cost)
+    \item Minimal hardware investment required
+    \item Standard webcam suitable for implementation
+    \item Development uses freely available IDEs and tools
+\end{itemize}
+
+\subsection{Operational Feasibility}
+
+\begin{itemize}
+    \item System is designed for end-users with minimal technical knowledge
+    \item Simple installation using pip package manager
+    \item Web-based dashboard provides intuitive interface
+    \item Can be extended to support new gestures incrementally
+\end{itemize}
+
+\subsection{Conclusion}
+
+All feasibility aspects are favorable. The project is technically sound, economically viable, and operationally feasible with proper planning and execution.

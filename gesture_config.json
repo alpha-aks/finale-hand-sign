@@ -1,0 +1,26 @@
+{
+  "thumbsup": {
+    "created": "2026-02-03T21:59:26.181129",
+    "description": "Gesture: thumbsup",
+    "last_updated": "2026-02-22T17:08:37.831455",
+    "image_count": 100
+  },
+  "hello": {
+    "created": "2026-02-22T16:58:53.701734",
+    "description": "Gesture: hello",
+    "last_updated": "2026-02-22T16:58:53.701743",
+    "image_count": 100
+  },
+  "peace": {
+    "created": "2026-02-22T17:05:13.714407",
+    "description": "Gesture: peace",
+    "last_updated": "2026-02-22T17:05:13.714426",
+    "image_count": 100
+  },
+  "thankyou": {
+    "created": "2026-02-22T17:07:40.724709",
+    "description": "Gesture: thankyou",
+    "last_updated": "2026-02-22T17:07:40.724718",
+    "image_count": 100
+  }
+}

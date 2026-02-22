@@ -1,0 +1,134 @@
+\chapter{Survey of Technologies}
+
+\section{Front-End Technologies}
+
+\subsection{Streamlit}
+
+Streamlit is an open-source Python framework that enables rapid development of web applications for machine learning and data science. It provides:
+\begin{itemize}
+    \item Easy-to-use API for creating interactive web interfaces
+    \item Real-time rendering without requiring frontend expertise
+    \item Built-in support for displaying images, videos, and charts
+    \item Session state management for multi-step workflows
+    \item Automatic caching and performance optimization
+\end{itemize}
+
+In this project, Streamlit is used for the enhanced dashboard (enhanced\_dashboard.py), which provides:
+\begin{itemize}
+    \item Training mode for collecting hand gesture images
+    \item Testing mode for gesture recognition evaluation
+    \item Typing mode with gesture-to-character mapping
+    \item Data visualization and statistics
+    \item Model training and validation interfaces
+\end{itemize}
+
+\subsection{OpenCV}
+
+OpenCV (Open Source Computer Vision Library) is used for:
+\begin{itemize}
+    \item Video capture and frame processing
+    \item Image preprocessing and enhancement
+    \item Drawing landmarks, bounding rectangles, and annotations
+    \item Color space conversions (BGR to RGB, BGR to HSV)
+    \item Histogram comparison for gesture recognition
+\end{itemize}
+
+\subsection{MediaPipe}
+
+MediaPipe is Google's framework for building multimodal machine learning pipelines. In this project:
+\begin{itemize}
+    \item HandLandmarker detects 21 hand landmarks in real-time
+    \item Provides x, y, z coordinates with confidence scores
+    \item Supports single and multiple hand detection
+    \item Operates in video mode for frame-to-frame consistency
+    \item Offers high accuracy with minimal latency
+\end{itemize}
+
+\section{Backend Technologies}
+
+\subsection{Python}
+
+Python 3.8+ is the primary programming language because of:
+\begin{itemize}
+    \item Rich ecosystem of ML and CV libraries
+    \item Excellent documentation and community support
+    \item Cross-platform compatibility (Windows, Linux, macOS)
+    \item Rapid development and prototyping capabilities
+\end{itemize}
+
+\subsection{TensorFlow/Keras}
+
+Used for building and training machine learning models:
+\begin{itemize}
+    \item Keras API for high-level model creation
+    \item Dense layers for keypoint classification
+    \item Dropout for regularization
+    \item Adam optimizer for efficient training
+    \item Model serialization (.hdf5 and .tflite formats)
+\end{itemize}
+
+\subsection{pyttsx3}
+
+Text-to-speech engine for audio output:
+\begin{itemize}
+    \item Offline speech synthesis (no internet required)
+    \item Cross-platform support
+    \item Adjustable speech rate
+    \item Threading for non-blocking audio playback
+\end{itemize}
+
+\section{Development Environment}
+
+\subsection{Visual Studio Code}
+
+VS Code is used as the primary IDE for:
+\begin{itemize}
+    \item Python development and debugging
+    \item Git version control integration
+    \item Jupyter Notebook support for data analysis
+    \item Linting and code formatting
+    \item IntelliSense and code completion
+    \item Terminal integration for running applications
+\end{itemize}
+
+\subsection{Git and Version Control}
+
+Version control system for:
+\begin{itemize}
+    \item Tracking code changes and history
+    \item Collaboration and code reviews
+    \item Project backup and recovery
+    \item Branch management for feature development
+\end{itemize}
+
+\subsection{Dependencies and Libraries}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|}
+\hline
+\textbf{Library} & \textbf{Purpose} \\
+\hline
+NumPy & Numerical computations and array operations \\
+\hline
+Pandas & Data manipulation and analysis \\
+\hline
+Scikit-learn & Machine learning utilities \\
+\hline
+Pillow (PIL) & Image processing \\
+\hline
+Matplotlib & Data visualization \\
+\hline
+Streamlit & Web application framework \\
+\hline
+MediaPipe & Hand detection and pose estimation \\
+\hline
+TensorFlow & Deep learning framework \\
+\hline
+OpenCV & Computer vision operations \\
+\hline
+pyttsx3 & Text-to-speech synthesis \\
+\hline
+\end{tabular}
+\caption{Key Libraries and Their Purpose}
+\end{table}

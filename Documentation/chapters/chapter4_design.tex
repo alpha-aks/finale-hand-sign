@@ -1,0 +1,217 @@
+\chapter{System Design}
+
+\section{System Architecture}
+
+The Indian Sign Language Detection System follows a modular architecture with the following main components:
+
+\begin{itemize}
+    \item \textbf{Input Module}: Video capture and preprocessing
+    \item \textbf{Detection Module}: Hand landmark detection
+    \item \textbf{Classification Module}: Gesture recognition
+    \item \textbf{Output Module}: Text and speech generation
+    \item \textbf{User Interface}: Web dashboard
+    \item \textbf{Data Management}: Training data and model storage
+\end{itemize}
+
+\section{Basic Modules}
+
+\subsection{Hand Detection Module (MediaPipe)}
+
+\begin{itemize}
+    \item Input: RGB video frame (640x480 resolution)
+    \item Process: Neural network-based hand detection
+    \item Output: 21 hand landmarks with x, y, z coordinates
+    \item Handles: Single and multiple hand detection, occlusion robustness
+\end{itemize}
+
+\subsection{Gesture Classification Module}
+
+\begin{itemize}
+    \item Input: Preprocessed landmark coordinates (84 values = 21 landmarks × 4)
+    \item Process: CNN/Dense network classification
+    \item Output: Gesture class (hello, thumbsup, etc.)
+    \item Trained on: Custom dataset (100+ images per gesture)
+\end{itemize}
+
+\subsection{Point History Tracking Module}
+
+\begin{itemize}
+    \item Input: Sequence of finger tip positions
+    \item Process: Historical trajectory analysis
+    \item Output: Complex gesture classification (swipe, circle, etc.)
+    \item Buffer: Stores last 16 frames of trajectory data
+\end{itemize}
+
+\subsection{Text-to-Speech Module}
+
+\begin{itemize}
+    \item Input: Recognized gesture text or user-typed text
+    \item Process: pyttsx3 engine synthesis
+    \item Output: Audio file playback
+    \item Threading: Non-blocking speech generation
+\end{itemize}
+
+\section{Data Flow Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=\textwidth]{diagrams/dfd_placeholder.png}
+\end{minipage}
+}
+\caption{Data Flow Diagram - System processes from input to output}
+\label{fig:dfd}
+\end{figure}
+
+The data flow follows this sequence:
+\begin{enumerate}
+    \item User provides video input (webcam feed)
+    \item Hand landmarks are detected using MediaPipe
+    \item Landmarks are preprocessed and normalized
+    \item Gesture classifier processes the landmarks
+    \item Point history classifier analyzes trajectory
+    \item Gesture name is generated
+    \item Text-to-speech converts output to audio
+    \item Results displayed in UI (text + speech)
+\end{enumerate}
+
+\section{Entity-Relationship Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=\textwidth]{diagrams/er_diagram.png}
+\end{minipage}
+}
+\caption{ER Diagram - Database and data structure relationships}
+\label{fig:er}
+\end{figure}
+
+\subsection{Main Entities}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Entity} & \textbf{Attributes} & \textbf{Description} \\
+\hline
+\multirow{3}{*}{Gesture} & gesture\_id (PK) & Unique gesture identifier \\
+& gesture\_name & Name of the gesture \\
+& created\_date & Creation timestamp \\
+\hline
+\multirow{4}{*}{TrainingImage} & image\_id (PK) & Unique image identifier \\
+& gesture\_id (FK) & Reference to gesture \\
+& image\_path & Location of image file \\
+& timestamp & Collection time \\
+\hline
+\multirow{3}{*}{Model} & model\_id (PK) & Unique model identifier \\
+& model\_type & (keypoint/history) \\
+& accuracy & Validation accuracy \\
+\hline
+\multirow{3}{*}{Session} & session\_id (PK) & Unique session identifier \\
+& recognized\_gestures & List of gestures \\
+& timestamp & Session start time \\
+\hline
+\end{tabular}
+\caption{Main Database Entities}
+\end{table}
+
+\section{Use Case Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=\textwidth]{diagrams/usecase_diagram.png}
+\end{minipage}
+}
+\caption{Use Case Diagram - System interactions with actors}
+\label{fig:usecase}
+\end{figure}
+
+Main use cases:
+\begin{enumerate}
+    \item Train New Gesture
+    \item Test Gesture Recognition
+    \item Type Using Gestures
+    \item View Training Data
+    \item Generate Speech Output
+    \item Manage Models
+\end{enumerate}
+
+\section{Class Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=\textwidth]{diagrams/class_diagram.png}
+\end{minipage}
+}
+\caption{Class Diagram - Object-oriented system structure}
+\label{fig:class}
+\end{figure}
+
+\subsection{Key Classes}
+
+\begin{itemize}
+    \item \textbf{KeyPointClassifier}: Gesture classification model
+    \item \textbf{PointHistoryClassifier}: Complex gesture recognition
+    \item \textbf{SimpleGestureRecognizer}: High-level gesture matching
+    \item \textbf{SimpleHandDetector}: Hand detection wrapper
+    \item \textbf{SpeechEngine}: Text-to-speech functionality
+\end{itemize}
+
+\section{Sequence Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=\textwidth]{diagrams/sequence_diagram.png}
+\end{minipage}
+}
+\caption{Sequence Diagram - Interaction timeline for gesture recognition}
+\label{fig:sequence}
+\end{figure}
+
+\subsection{Gesture Recognition Sequence}
+
+\begin{enumerate}
+    \item User shows gesture to camera
+    \item System captures video frame
+    \item MediaPipe detects hand landmarks
+    \item Landmarks are normalized and preprocessed
+    \item Classifier predicts gesture type
+    \item If complex gesture: analyze point history
+    \item Generate text output
+    \item Trigger text-to-speech
+    \item Display results in UI
+\end{enumerate}
+
+\section{Activity Diagram}
+
+\begin{figure}[H]
+\centering
+\fbox{
+\begin{minipage}{0.9\textwidth}
+\includegraphics[width=\textwidth]{diagrams/activity_diagram.png}
+\end{minipage}
+}
+\caption{Activity Diagram - Processing workflow and decision points}
+\label{fig:activity}
+\end{figure}
+
+\subsection{Main Activities}
+
+\begin{enumerate}
+    \item Video Capture: Initialize camera and capture frames
+    \item Hand Detection: Apply MediaPipe landmark detection
+    \item Preprocessing: Normalize and scale landmark data
+    \item Classification: Feed to gesture classifier
+    \item Decision: Confidence threshold check
+    \item Output Generation: Create text and speech
+    \item Display: Show results to user
+\end{enumerate}
