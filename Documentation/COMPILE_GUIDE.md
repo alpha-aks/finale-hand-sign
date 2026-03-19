@@ -23,7 +23,7 @@ This guide helps you compile the Indian Sign Language Detection System report fo
    │   ├── chapter5_pipeline.tex
    │   ├── chapter6_implementation.tex
    │   ├── chapter7_results.tex
-   │   └── chapter8_conclusion.tex
+   │   └── chapter7_conclusion.tex
    └── diagrams/
        ├── (add your diagram PNG files here)
    ```
@@ -127,7 +127,7 @@ Documentation/
 │   ├── chapter5_pipeline.tex
 │   ├── chapter6_implementation.tex
 │   ├── chapter7_results.tex
-│   └── chapter8_conclusion.tex
+│   └── chapter7_conclusion.tex
 ├── diagrams/                             (Diagram images)
 │   ├── dfd_placeholder.png
 │   ├── er_diagram.png

@@ -15,7 +15,7 @@ Complete Overleaf-compatible documentation for the ISL Sign-to-Speech Converter 
 - **chapters/chapter5_pipeline.tex** - Detailed pipeline explanation with dataset creation methodology
 - **chapters/chapter6_implementation.tex** - Implementation details, code samples, installation
 - **chapters/chapter7_results.tex** - Performance metrics, feature list, achievements
-- **chapters/chapter8_conclusion.tex** - Conclusion and future work
+- **chapters/chapter7_conclusion.tex** - Conclusions, limitations, and future scope
 
 ### Additional Documentation
 - **PIPELINE_OVERVIEW.md** - Comprehensive pipeline flowcharts and explanations
@@ -102,7 +102,7 @@ Documentation/
 │   ├── chapter5_pipeline.tex
 │   ├── chapter6_implementation.tex
 │   ├── chapter7_results.tex
-│   └── chapter8_conclusion.tex
+│   └── chapter7_conclusion.tex
 ├── diagrams/                   # For images and diagrams
 │   ├── dfd_placeholder.png
 │   ├── er_diagram.png
@@ -172,7 +172,7 @@ Documentation/
 - User testing results
 - Achievements and milestones
 
-### Chapter 8: Conclusion and Future Work
+### Chapter 7: Conclusions
 - Project summary
 - Key accomplishments
 - Short/medium/long-term enhancements

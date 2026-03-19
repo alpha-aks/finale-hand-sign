@@ -15,6 +15,26 @@ The Indian Sign Language Detection System follows a modular architecture with th
 
 \section{Basic Modules}
 
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Module} & \textbf{Input} & \textbf{Output} \\
+\hline
+Hand Detection & RGB frame stream & 21-point hand landmarks \\
+\hline
+Gesture Classification & Normalized landmarks & Predicted gesture label \\
+\hline
+Point History Tracking & Fingertip trajectory sequence & Motion-gesture class \\
+\hline
+Text-to-Speech & Gesture text/token & Audible speech output \\
+\hline
+Dashboard Interface & User controls and camera feed & Training/testing interaction \\
+\hline
+\end{tabular}
+\caption{Basic Modules and I/O Mapping}
+\end{table}
+
 \subsection{Hand Detection Module (MediaPipe)}
 
 \begin{itemize}
@@ -29,7 +49,7 @@ The Indian Sign Language Detection System follows a modular architecture with th
 \begin{itemize}
     \item Input: Preprocessed landmark coordinates (84 values = 21 landmarks × 4)
     \item Process: CNN/Dense network classification
-    \item Output: Gesture class (hello, thumbsup, etc.)
+    \item Output: Gesture class (recognizable ISL gestures)
     \item Trained on: Custom dataset (100+ images per gesture)
 \end{itemize}
 
@@ -64,6 +84,25 @@ The Indian Sign Language Detection System follows a modular architecture with th
 \label{fig:dfd}
 \end{figure}
 
+\subsection{Detailed Diagram Description (For Generation)}
+
+Use this structure while generating the DFD:
+\begin{itemize}
+    \item \textbf{External Entity}: User (shows gesture to camera and receives text/speech output)
+    \item \textbf{Input Process}: Webcam Capture (reads real-time frames)
+    \item \textbf{Process 1}: Frame Preprocessing (flip, resize, color conversion BGR to RGB)
+    \item \textbf{Process 2}: Hand Landmark Detection (MediaPipe extracts 21 points per hand)
+    \item \textbf{Process 3}: Landmark Preprocessing (normalization, feature vector creation)
+    \item \textbf{Process 4}: Keypoint Classification (predict static gesture label)
+    \item \textbf{Process 5}: Point History Classification (predict motion gesture from trajectory)
+    \item \textbf{Data Store D1}: Training Dataset (gesture images and CSV features)
+    \item \textbf{Data Store D2}: Model Files (.hdf5/.tflite classifiers and label CSVs)
+    \item \textbf{Process 6}: Output Formatter (map class ID to gesture text)
+    \item \textbf{Process 7}: Text-to-Speech Engine (convert text to audio)
+    \item \textbf{Output}: Dashboard/Window display + speaker audio
+    \item \textbf{Main Flow}: User -> Webcam -> Preprocessing -> Detection -> Preprocessing -> Classification -> Text -> Speech/Display -> User
+\end{itemize}
+
 The data flow follows this sequence:
 \begin{enumerate}
     \item User provides video input (webcam feed)
@@ -88,6 +127,40 @@ The data flow follows this sequence:
 \caption{ER Diagram - Database and data structure relationships}
 \label{fig:er}
 \end{figure}
+
+\subsection{Detailed Diagram Description (For Generation)}
+
+Use the following entities, keys, and relationships:
+\begin{itemize}
+    \item \textbf{Entity: Gesture}
+    \begin{itemize}
+        \item Attributes: gesture\_id (PK), gesture\_name, created\_date
+    \end{itemize}
+    \item \textbf{Entity: TrainingImage}
+    \begin{itemize}
+        \item Attributes: image\_id (PK), gesture\_id (FK), image\_path, timestamp
+    \end{itemize}
+    \item \textbf{Entity: Model}
+    \begin{itemize}
+        \item Attributes: model\_id (PK), model\_type, accuracy, trained\_date
+    \end{itemize}
+    \item \textbf{Entity: Session}
+    \begin{itemize}
+        \item Attributes: session\_id (PK), start\_time, end\_time, recognized\_gestures
+    \end{itemize}
+    \item \textbf{Entity: PredictionLog}
+    \begin{itemize}
+        \item Attributes: log\_id (PK), session\_id (FK), gesture\_id (FK), confidence, log\_time
+    \end{itemize}
+\end{itemize}
+
+Relationship guidance:
+\begin{itemize}
+    \item Gesture (1) to TrainingImage (N)
+    \item Session (1) to PredictionLog (N)
+    \item Gesture (1) to PredictionLog (N)
+    \item Model can be shown as independent configuration entity used by classification pipeline
+\end{itemize}
 
 \subsection{Main Entities}
 
@@ -131,6 +204,35 @@ The data flow follows this sequence:
 \label{fig:usecase}
 \end{figure}
 
+\subsection{Detailed Diagram Description (For Generation)}
+
+Use Case diagram specification:
+\begin{itemize}
+    \item \textbf{Primary Actor}: User
+    \item \textbf{Secondary Actor}: Administrator/Developer (optional for model management)
+    \item \textbf{System Boundary}: ISL Detection System
+    \item \textbf{Use Cases}:
+    \begin{itemize}
+        \item Train New Gesture
+        \item Collect Training Images
+        \item Train/Update Model
+        \item Test Gesture Recognition
+        \item Recognize Gesture in Real Time
+        \item View Training Data Statistics
+        \item Type Using Gestures
+        \item Convert Text to Speech
+        \item Manage Gesture Mapping
+    \end{itemize}
+\end{itemize}
+
+Relation guidance:
+\begin{itemize}
+    \item \texttt{Test Gesture Recognition} includes \texttt{Recognize Gesture in Real Time}
+    \item \texttt{Type Using Gestures} includes \texttt{Recognize Gesture in Real Time}
+    \item \texttt{Type Using Gestures} includes \texttt{Convert Text to Speech}
+    \item \texttt{Train New Gesture} includes \texttt{Collect Training Images} and \texttt{Train/Update Model}
+\end{itemize}
+
 Main use cases:
 \begin{enumerate}
     \item Train New Gesture
@@ -154,6 +256,42 @@ Main use cases:
 \label{fig:class}
 \end{figure}
 
+\subsection{Detailed Diagram Description (For Generation)}
+
+Class diagram structure to generate:
+\begin{itemize}
+    \item \textbf{SimpleHandDetector}
+    \begin{itemize}
+        \item Methods: detect\_hands(frame), get\_landmarks(), get\_handedness()
+    \end{itemize}
+    \item \textbf{KeyPointClassifier}
+    \begin{itemize}
+        \item Methods: \_\_init\_\_(model\_path), \_\_call\_\_(landmark\_list)
+    \end{itemize}
+    \item \textbf{PointHistoryClassifier}
+    \begin{itemize}
+        \item Methods: \_\_init\_\_(model\_path), \_\_call\_\_(history\_vector)
+    \end{itemize}
+    \item \textbf{SimpleGestureRecognizer}
+    \begin{itemize}
+        \item Methods: preprocess\_landmarks(), predict\_gesture(), map\_label()
+    \end{itemize}
+    \item \textbf{SpeechEngine}
+    \begin{itemize}
+        \item Methods: speak\_text(text), \_speak\_worker()
+    \end{itemize}
+    \item \textbf{DashboardController}
+    \begin{itemize}
+        \item Methods: train\_mode(), test\_mode(), typing\_mode(), view\_data\_mode()
+    \end{itemize}
+\end{itemize}
+
+Association guidance:
+\begin{itemize}
+    \item DashboardController uses SimpleHandDetector, KeyPointClassifier, PointHistoryClassifier, and SpeechEngine
+    \item SimpleGestureRecognizer depends on KeyPointClassifier and label mappings
+\end{itemize}
+
 \subsection{Key Classes}
 
 \begin{itemize}
@@ -176,6 +314,27 @@ Main use cases:
 \caption{Sequence Diagram - Interaction timeline for gesture recognition}
 \label{fig:sequence}
 \end{figure}
+
+\subsection{Detailed Diagram Description (For Generation)}
+
+Use the following participants and message order:
+\begin{itemize}
+    \item Participants: User, Camera, Preprocessor, HandDetector, LandmarkPreprocessor, KeypointClassifier, HistoryClassifier, OutputManager, SpeechEngine, UI
+    \item Sequence:
+    \begin{enumerate}
+        \item User -> Camera: show gesture
+        \item Camera -> Preprocessor: raw frame
+        \item Preprocessor -> HandDetector: processed frame
+        \item HandDetector -> LandmarkPreprocessor: hand landmarks
+        \item LandmarkPreprocessor -> KeypointClassifier: normalized vector
+        \item LandmarkPreprocessor -> HistoryClassifier: trajectory vector (optional)
+        \item KeypointClassifier -> OutputManager: class id + confidence
+        \item HistoryClassifier -> OutputManager: motion class (optional)
+        \item OutputManager -> UI: display text label and confidence
+        \item OutputManager -> SpeechEngine: speak(label)
+        \item SpeechEngine -> User: audio output
+    \end{enumerate}
+\end{itemize}
 
 \subsection{Gesture Recognition Sequence}
 
@@ -204,6 +363,42 @@ Main use cases:
 \label{fig:activity}
 \end{figure}
 
+\subsection{Detailed Diagram Description (For Generation)}
+
+Activity flow to generate:
+\begin{enumerate}
+    \item Start
+    \item Initialize camera and models
+    \item Capture frame
+    \item Preprocess frame
+    \item Detect hand landmarks
+    \item Decision: Hand detected?
+    \begin{itemize}
+        \item No -> Capture next frame
+        \item Yes -> Continue
+    \end{itemize}
+    \item Preprocess landmarks
+    \item Predict static gesture
+    \item Update point history
+    \item Decision: Enough history for motion classification?
+    \begin{itemize}
+        \item No -> Skip motion class
+        \item Yes -> Predict motion gesture
+    \end{itemize}
+    \item Map class to text label
+    \item Display result in UI
+    \item Decision: Auto-speak enabled?
+    \begin{itemize}
+        \item Yes -> Send text to speech engine
+        \item No -> Continue
+    \end{itemize}
+    \item Decision: Exit key/button pressed?
+    \begin{itemize}
+        \item No -> Loop to capture frame
+        \item Yes -> Stop camera, release resources, End
+    \end{itemize}
+\end{enumerate}
+
 \subsection{Main Activities}
 
 \begin{enumerate}
@@ -215,3 +410,213 @@ Main use cases:
     \item Output Generation: Create text and speech
     \item Display: Show results to user
 \end{enumerate}
+
+\section{Data Design Summary}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Data Component} & \textbf{Storage Form} & \textbf{Design Purpose} \\
+\hline
+Training images & Gesture-wise folder structure & Label organization and scalable data collection \\
+\hline
+Landmark features & CSV rows (numeric vectors) & Lightweight model-training input format \\
+\hline
+Label mapping & CSV label files & Stable class-index to gesture-name mapping \\
+\hline
+Configuration & JSON metadata file & Persisted gesture and dashboard settings \\
+\hline
+Trained models & HDF5 and TFLite files & Training-time and deployment-time compatibility \\
+\hline
+\end{tabular}
+\caption{Data Design Overview}
+\end{table}
+
+\section{Procedural Design Summary}
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|p{0.62\textwidth}|}
+\hline
+\textbf{Procedure} & \textbf{Algorithmic Logic} \\
+\hline
+Landmark preprocessing & Wrist-centered normalization and flattening to create translation/scale invariant features. \\
+\hline
+Gesture inference & Pass normalized vector to classifier and select highest confidence class. \\
+\hline
+Temporal motion handling & Maintain fixed-length history window and classify trajectory patterns. \\
+\hline
+Speech generation & Run non-blocking speech synthesis thread for recognized tokens/text. \\
+\hline
+\end{tabular}
+\caption{Procedural Design and Algorithm Mapping}
+\end{table}
+
+\section{Design Patterns and Principles}
+
+\subsection{Architectural Patterns}
+
+\subsubsection{Pipeline Pattern}
+
+The system implements a linear pipeline pattern:
+\begin{itemize}
+    \item Input (webcam frame) → Preprocessing → Detection → Classification → Output
+    \item Each stage is independent, allowing for modular testing and replacement
+    \item Data flows sequentially without feedback loops
+    \item Exceptions are handled at each stage with graceful fallback
+\end{itemize}
+
+\subsubsection{MVC (Model-View-Controller) in Dashboard}
+
+The Streamlit dashboard implements MVC principles:
+\begin{itemize}
+    \item \textbf{Model}: Trained gesture classifiers and data structures
+    \item \textbf{View}: Streamlit UI components and visualizations
+    \item \textbf{Controller}: Mode functions (train\_mode, test\_mode, typing\_mode)
+    \item Separation ensures UI logic doesn't interfere with core recognition
+\end{itemize}
+
+\subsection{Design Principles}
+
+\subsubsection{Separation of Concerns}
+
+\begin{itemize}
+    \item \textbf{Detection Logic}: Isolated in MediaPipe wrapper class
+    \item \textbf{Classification Logic}: Separate modules for keypoint and history classifiers
+    \item \textbf{UI Logic}: Contained in Streamlit dashboard
+    \item \textbf{Output Logic}: Separate handler for text and speech output
+    \item Each component has single responsibility with clear interfaces
+\end{itemize}
+
+\subsubsection{SOLID Principles}
+
+\begin{itemize}
+    \item \textbf{Single Responsibility}: Each class has one reason to change
+    \item \textbf{Open/Closed}: System open for extension (new gestures) but closed for modification
+    \item \textbf{Liskov Substitution}: Classifiers have consistent interface for substitution
+    \item \textbf{Interface Segregation}: Classes expose only necessary methods to other components
+\end{itemize}
+
+\section{Error Handling and Exception Strategy}
+
+\subsection{Exception Handling}
+
+\begin{itemize}
+    \item \textbf{Camera Integration}: Graceful handling of camera unavailability with retry logic
+    \item \textbf{Model Loading}: Validation of model files with fallback to default models
+    \item \textbf{Hand Detection Failures}: Continuous monitoring with "No hand" feedback
+    \item \textbf{Classification Errors}: Confidence thresholding to identify uncertain predictions
+    \item \textbf{Audio System}: Fallback to visual-only output if text-to-speech unavailable
+\end{itemize}
+
+\section{Performance and Scalability}
+
+\subsection{Performance Optimizations}
+
+\begin{itemize}
+    \item \textbf{Model Quantization}: TFLite reduces model by 60\% with minimal accuracy loss
+    \item \textbf{Vectorized Operations}: NumPy for fast preprocessing instead of Python loops
+    \item \textbf{Threading}: Background thread for speech synthesis prevents UI blocking
+    \item \textbf{Memory Efficiency}: Reusable buffers for frame storage
+\end{itemize}
+
+\subsection{Scalability}
+
+\begin{itemize}
+    \item \textbf{Gesture Vocabulary}: Scales to 20-30 practical gestures; training time ~30 min per gesture
+    \item \textbf{Model Size}: Remains <1 MB even with 30 gestures
+    \item \textbf{Deployment}: Containerization (Docker) feasible for cloud deployment
+    \item \textbf{Multi-Instance}: Load balancing possible for web service variants
+\end{itemize}
+
+\section{Configuration and Customization}
+
+\subsection{Tunable Parameters}
+
+\begin{itemize}
+    \item \textbf{Camera Resolution}: Default 640x480, adjustable for different hardware
+    \item \textbf{Detection Confidence}: 0.5-0.7 tunable threshold
+    \item \textbf{Classification Confidence}: Minimum 0.7 for reporting gestures
+    \item \textbf{Speech Rate}: 150-200 WPM configurable
+    \item \textbf{History Buffer}: 16 frames for temporal analysis
+\end{itemize}
+
+\subsection{Extensibility Points}
+
+\begin{itemize}
+    \item New gesture models: Add TFLite file + label CSV
+    \item Alternative detection: Replace MediaPipe with alternative library
+    \item Custom classifiers: Plug in alternative ML models
+    \item Language support: Add language-specific labels and TTS models
+\end{itemize}
+
+\section{Security Design}
+
+\subsection{Data Protection}
+
+\begin{itemize}
+    \item \textbf{Local Processing}: All data stays on user's machine; no cloud upload
+    \item \textbf{No Persistent Logging}: Video frames and audio not stored permanently
+    \item \textbf{User Control}: Training data in user-controlled directories
+    \item \textbf{Input Validation}: Frame dimensions, landmark confidences verified before processing
+\end{itemize}
+
+\section{Database and Data Persistence}
+
+\subsection{Storage Strategy}
+
+\begin{itemize}
+    \item \textbf{Training Data}: Organized in folder hierarchy by gesture name
+    \item \textbf{Models}: Stored as HDF5 (training) and TFLite (deployment) files
+    \item \textbf{Labels}: CSV format for class-index to name mapping
+    \item \textbf{Logs}: CSV-based session and prediction logs
+    \item \textbf{Advantages}: Simple, human-readable, version-control friendly
+\end{itemize}
+
+\section{User Interface and Interaction}
+
+\subsection{Interface Layers}
+
+\begin{itemize}
+    \item \textbf{Web Dashboard} (primary): Streamlit with training/testing/typing modes
+    \item \textbf{Real-Time Feedback}: Live video, landmarks, and confidence display
+    \item \textbf{Settings}: User-adjustable parameters (speech rate, confidence threshold)
+    \item \textbf{Visualization}: Gesture history, training statistics, model performance charts
+\end{itemize}
+
+\subsection{Key Interaction Flows}
+
+\subsubsection{Training Workflow}
+\begin{enumerate}
+    \item User selects "Train New Gesture" mode
+    \item Specifies gesture name and image count target
+    \item Captures images via webcam in dashboard
+    \item Images automatically labeled and stored
+    \item Model retraining automatically triggered
+    \item System ready with new gesture integrated
+\end{enumerate}
+
+\subsubsection{Recognition Workflow}
+\begin{enumerate}
+    \item User selects "Test & Recognize" mode
+    \item Real-time video shows hand detection
+    \item Detected hand landmarks overlaid on video
+    \item Recognized gesture displayed with confidence
+    \item Gesture automatically spoken aloud
+    \item History maintained for reference
+\end{enumerate}
+
+\section{Design Validation Points}
+
+The system design has been validated against the following criteria:
+
+\begin{itemize}
+    \item \textbf{Modularity}: Each component can be tested, replaced, or upgraded independently
+    \item \textbf{Maintainability}: Code follows clear structure with minimal technical debt
+    \item \textbf{Extensibility}: New gestures, models, and features can be added without major refactoring
+    \item \textbf{Robustness}: Error handling covers primary failure modes
+    \item \textbf{Performance}: Meets real-time processing requirements (\textgreater 20 FPS)
+    \item \textbf{Usability}: UI designed for non-technical end-users
+    \item \textbf{Scalability}: Architecture supports gesture vocabulary growth and multi-user deployment
+\end{itemize}

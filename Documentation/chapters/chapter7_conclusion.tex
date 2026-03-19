@@ -1,0 +1,52 @@
+\chapter{Conclusions}
+
+\section{Conclusion}
+
+This project demonstrates a practical and deployable Indian Sign Language (ISL) recognition system using computer vision and machine learning. The implemented pipeline captures live webcam input, detects hand landmarks, classifies gestures, and generates text and speech output in real time. The system was designed with usability in mind and integrated into a Streamlit dashboard for training, testing, and gesture-based interaction.
+
+The key outcome of this work is that an assistive communication tool can be developed using open-source technologies with affordable hardware. Even with limited resources and dataset constraints, the project achieved stable real-time performance and provided a strong foundation for further expansion.
+
+Overall, the project meets its primary objectives:
+\begin{itemize}
+    \item Real-time ISL gesture recognition workflow
+    \item Gesture-to-text and text-to-speech output
+    \item Dashboard-based dataset creation and testing support
+    \item Modular architecture for future extension
+\end{itemize}
+
+\section{Limitations of the System}
+
+The following limitations were observed during testing and could not be fully resolved within the project timeline:
+\begin{itemize}
+    \item \textbf{Limited gesture vocabulary}: Only a small set of trained gestures is currently available compared to full ISL coverage.
+    \item \textbf{Lighting sensitivity}: Recognition accuracy drops under very low light or harsh backlight conditions.
+    \item \textbf{Signer variation}: Differences in hand size, gesture style, speed, and camera distance can affect prediction confidence.
+    \item \textbf{Occlusion and overlap}: Partial hand occlusion and complex backgrounds may reduce landmark quality.
+    \item \textbf{Continuous sentence understanding}: The current system focuses on gesture-level recognition, not full grammar-level continuous sign translation.
+\end{itemize}
+
+These limitations are expected in early-stage assistive prototypes and represent clear targets for the next development cycle.
+
+\section{Future Scope of the Project}
+
+There are multiple directions for extending this project into a more complete and robust assistive platform.
+
+\subsection{New Areas of Investigation}
+
+\begin{itemize}
+    \item Sequence models (LSTM/Transformer) for continuous sign-to-sentence translation
+    \item Multi-user and multi-hand interaction scenarios in real-world environments
+    \item Signer-independent modeling for better generalization across users
+    \item Fusion of landmark, image, and temporal features for higher robustness
+\end{itemize}
+
+\subsection{Work Not Completed Due to Time Constraints or Technical Challenges}
+
+\begin{itemize}
+    \item Full ISL alphabet and sentence-level dataset preparation
+    \item Large-scale accuracy benchmarking across many users and environments
+    \item Mobile deployment and edge-optimized inference packaging
+    \item End-to-end conversational translation workflow with context memory
+\end{itemize}
+
+With these enhancements, the system can evolve from a strong prototype into a practical accessibility product for education, healthcare, and public service use.

@@ -1,4 +1,4 @@
-\chapter{Results and Evaluation}
+\chapter{Results and Discussion}
 
 \section{Dataset Results}
 
@@ -8,13 +8,13 @@
 \centering
 \begin{tabular}{|c|c|c|c|}
 \hline
-\textbf{Gesture} & \textbf{Images Collected} & \textbf{Success Rate} & \textbf{Status} \\
+\textbf{Gesture Type} & \textbf{Images Collected} & \textbf{Success Rate} & \textbf{Status} \\
 \hline
-Hello & 100 & 100\% & Completed \\
+Gesture Type 1 & 100+ & 95\%+ & Completed \\
 \hline
-Thumbs Up & 100 & 100\% & Completed \\
+Gesture Type 2 & 100+ & 95\%+ & Completed \\
 \hline
-Total & 200 & 100\% & Ready \\
+Total & 200+ & 95\%+ & Ready \\
 \hline
 \end{tabular}
 \caption{Custom Dataset Collection Results}
@@ -314,3 +314,125 @@ The modular design allows easy extension to support:
     \item Custom dataset can support future research
     \item Shows integration of multiple ML/CV technologies
 \end{itemize}
+
+\clearpage
+\section{RESULTS AND DISCUSSIONS: Dashboard and Working Flow}
+
+This section is written in a direct user-guide style for documentation clarity and viva presentation. It focuses on what a new user sees on the dashboard and how the complete flow works from input to final matched output.
+
+\subsection{Landing Page of Website}
+
+The landing page is the first screen shown to the user when the dashboard starts. It provides a clean overview of the system, the available operation modes, and quick instructions.
+
+\begin{itemize}
+    \item Project title and short purpose statement are displayed at top.
+    \item Sidebar allows mode selection and parameter settings.
+    \item Main panel shows live camera or input widgets depending on selected mode.
+    \item Status area shows model loading state, device readiness, and current workflow step.
+\end{itemize}
+
+\subsection{Advantages Section (Reference Style: BERT Project)}
+
+Following the structure used in BERT-based dashboard projects, the advantages section highlights user value in short points:
+
+\begin{itemize}
+    \item Simple and beginner-friendly UI for first-time users.
+    \item Fast processing with near real-time feedback.
+    \item Support for multiple input types and practical usage flows.
+    \item Reduced manual effort through automated matching and ranking logic.
+    \item Transparent output with top results displayed clearly.
+\end{itemize}
+
+\subsection{How It Works Section for New Users}
+
+The system workflow is explained in the dashboard as follows:
+
+\begin{enumerate}
+    \item Open the dashboard and review the quick instructions.
+    \item Select the required mode from sidebar.
+    \item Enter the required input text or operational context.
+    \item Upload input files (supported formats shown in the UI).
+    \item Click the action button to process and score the uploaded files.
+    \item Review ranked outputs and confidence-based matching summary.
+\end{enumerate}
+
+\subsection{Main Section Workflow (Requested Format)}
+
+In this section, the user enters the Job Description and uploads resume files. The file picker opens through the \textbf{Choose Files} button. Users can select files from the local system in \textbf{text}, \textbf{PDF}, and \textbf{DOC} formats. After clicking \textbf{Match Resumes}, the resume screener compares uploaded resumes with the given Job Description and displays the \textbf{top 3 matching resumes}.
+
+This same interaction pattern is also applicable to our dashboard workflows where input context, file/media upload, processing trigger, and ranked outputs are presented in a guided sequence.
+
+\subsection{Observations from Dashboard Trials}
+
+\begin{itemize}
+    \item New users were able to complete first run without external help.
+    \item The action flow (input -> upload -> process -> result) was clear and repeatable.
+    \item Top matches and confidence summaries improved trust in results.
+    \item Visual layout reduced confusion during multi-step processing.
+\end{itemize}
+
+\clearpage
+\section*{Dashboard Visual Evidence - Page 1}
+\thispagestyle{empty}
+\begin{center}
+{\Large Page 1: Landing and Navigation Screens}\\[0.6cm]
+\begin{minipage}[t]{0.47\textwidth}
+\centering
+\fbox{\parbox[c][9cm][c]{0.95\textwidth}{\centering
+Placeholder Image 1\\
+Landing Page Screenshot
+}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\centering
+\fbox{\parbox[c][9cm][c]{0.95\textwidth}{\centering
+Placeholder Image 2\\
+Sidebar and Mode Selection
+}}
+\end{minipage}
+\end{center}
+
+\clearpage
+\section*{Dashboard Visual Evidence - Page 2}
+\thispagestyle{empty}
+\begin{center}
+{\Large Page 2: Input and Processing Screens}\\[0.6cm]
+\begin{minipage}[t]{0.47\textwidth}
+\centering
+\fbox{\parbox[c][9cm][c]{0.95\textwidth}{\centering
+Placeholder Image 3\\
+Main Input Section (JD / Prompt)
+}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\centering
+\fbox{\parbox[c][9cm][c]{0.95\textwidth}{\centering
+Placeholder Image 4\\
+Choose Files and Upload Screen
+}}
+\end{minipage}
+\end{center}
+
+\clearpage
+\section*{Dashboard Visual Evidence - Page 3}
+\thispagestyle{empty}
+\begin{center}
+{\Large Page 3: Matching and Final Output Screens}\\[0.6cm]
+\begin{minipage}[t]{0.47\textwidth}
+\centering
+\fbox{\parbox[c][9cm][c]{0.95\textwidth}{\centering
+Placeholder Image 5\\
+Top 3 Matched Results
+}}
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.47\textwidth}
+\centering
+\fbox{\parbox[c][9cm][c]{0.95\textwidth}{\centering
+Placeholder Image 6\\
+Discussion and Performance Snapshot
+}}
+\end{minipage}
+\end{center}

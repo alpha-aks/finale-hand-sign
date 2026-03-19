@@ -3,7 +3,8 @@
 % Packages
 \usepackage[margin=1in]{geometry}
 \usepackage{graphicx}
-\usepackage{hyperref}
+\usepackage{microtype}
+\usepackage[pdftex,hidelinks]{hyperref}
 \usepackage{natbib}
 \usepackage{fancyhdr}
 \usepackage{setspace}
@@ -15,6 +16,27 @@
 \usepackage{array}
 \usepackage{booktabs}
 \usepackage{float}
+\usepackage{multirow}
+\usepackage{tikz}
+\usetikzlibrary{calc}
+\usepackage{eso-pic}
+
+% Increase tolerance for better line breaking in TOC
+\tolerance=1414
+\hbadness=1414
+\emergencystretch=1.5em
+\hfuzz=0.3pt
+
+% Border around each PDF page (applied to all pages)
+\newcommand{\PageBorder}{
+    \begin{tikzpicture}[remember picture,overlay]
+        \draw[line width=1.0pt]
+        ($(current page.north west)+(0.35cm,-0.35cm)$)
+        rectangle
+        ($(current page.south east)+(-0.35cm,0.35cm)$);
+    \end{tikzpicture}
+}
+\AddToShipoutPictureBG{\PageBorder}
 
 % Code listings style
 \lstset{
@@ -50,7 +72,7 @@
 
 % Abstract
 \begin{abstract}
-This report presents the development of an Indian Sign Language (ISL) Detection System that converts hand gestures into text and speech output. The system utilizes computer vision techniques and machine learning algorithms to recognize sign language gestures in real-time. Due to the unavailability of public ISL datasets, we developed our own training dataset with 200+ labeled images covering multiple gestures (hello, thumbsup, and extensible for more gestures). The system employs MediaPipe for hand landmark detection, TensorFlow/Keras for gesture classification, and text-to-speech engines for audio output. This solution bridges communication gaps between hearing-impaired and non-sign language users, promoting digital inclusivity.
+This report presents the development of an Indian Sign Language (ISL) Detection System that converts hand gestures into text and speech output. The system utilizes computer vision techniques and machine learning algorithms to recognize sign language gestures in real-time. Due to the unavailability of public ISL datasets, we developed our own training dataset with 200+ labeled images covering multiple gesture types and is easily extensible for additional gestures. The system employs MediaPipe for hand landmark detection, TensorFlow/Keras for gesture classification, and text-to-speech engines for audio output. This solution bridges communication gaps between hearing-impaired and non-sign language users, promoting digital inclusivity.
 \end{abstract}
 
 % Table of Contents
@@ -58,7 +80,7 @@ This report presents the development of an Indian Sign Language (ISL) Detection 
 \newpage
 
 % Introduction
-\chapter{Introduction}
+\chapter{INTRODUCTION}
 
 \section{Background}
 
@@ -68,18 +90,45 @@ With rapid advancements in artificial intelligence, computer vision, and machine
 
 In this context, the Indian Sign Language (ISL) Detection System – Sign-to-Speech Converter has been developed to facilitate real-time communication between the hearing-impaired and non-sign language users. The system captures hand gestures through a webcam, processes them using machine learning algorithms, and converts them into corresponding text and voice outputs. This project aims to promote digital inclusivity and assistive communication, showcasing the use of technology to enhance accessibility for all members of society.
 
+\section{Importance of Indian Sign Language (ISL) Recognition}
+
+India is home to approximately 7.7 million people with hearing impairments. ISL is the primary communication method for many of these individuals. However, several challenges exist:
+
+\begin{itemize}
+    \item \textbf{Communication Barrier}: Most non-deaf individuals do not understand ISL, creating communication bottlenecks in public services, healthcare, and education.
+    \item \textbf{Limited Translator Availability}: The shortage of professional ISL translators makes it expensive and inaccessible for many situations.
+    \item \textbf{Digital Divide}: Limited digital tools that can interpret ISL gestures exist, especially those tailored for the Indian sign language system.
+    \item \textbf{Social Integration}: Technology-enabled solutions can help hearing-impaired individuals participate more fully in digital society.
+    \item \textbf{Educational Access}: Automated gesture recognition can support distance learning and accessibility for deaf students.
+\end{itemize}
+
+Bridging these gaps through automated gesture recognition systems is therefore critical for promoting inclusive communication and accessibility.
+
+\section{Problem Statement}
+
+The lack of publicly available Indian Sign Language datasets and gesture recognition systems presents a significant challenge. While sign language recognition has been explored internationally, ISL-specific solutions are rare. The goal is to develop a practical, real-time gesture recognition system that:
+
+\begin{itemize}
+    \item Recognizes common ISL gestures without requiring extensive professional datasets
+    \item Provides text and speech output for recognized gestures
+    \item Operates in real-time with minimal latency
+    \item Is deployable on standard hardware (desktop, laptop, webcam)
+    \item Can be extended to recognize additional gestures
+\end{itemize}
+
 \section{Objectives}
 
 The primary objectives of this project are:
 
 \begin{enumerate}
     \item To develop a real-time Indian Sign Language recognition system capable of detecting and interpreting hand gestures from a webcam feed
-    \item To create a custom training dataset due to the lack of publicly available ISL datasets
-    \item To implement machine learning models for gesture classification using Convolutional Neural Networks (CNN) and other classifiers
+    \item To create a custom training dataset to overcome the lack of publicly available ISL datasets
+    \item To implement machine learning models for gesture classification using Convolutional Neural Networks (CNN) and keypoint-based classifiers
     \item To provide text and speech output for recognized gestures, enabling natural communication
     \item To develop a user-friendly dashboard interface for training, testing, and using the system
     \item To support both single-hand and dual-hand gesture recognition
-    \item To provide a typing mode using hand gestures with text-to-speech capabilities
+    \item To provide a typing mode using hand gestures with integrated text-to-speech capabilities
+    \item To ensure robust performance across varying lighting conditions, hand positions, and user variations
 \end{enumerate}
 
 \section{Purpose, Scope, and Applicability}
@@ -89,35 +138,78 @@ The primary objectives of this project are:
 The purpose of this system is to:
 \begin{itemize}
     \item Facilitate seamless communication between hearing-impaired individuals and the general population
-    \item Provide an assistive technology solution that bridges the digital divide
-    \item Demonstrate practical applications of computer vision and machine learning in accessibility
-    \item Create a reusable framework for sign language recognition that can be extended to other languages and gesture types
+    \item Provide an assistive technology solution that bridges the digital divide and improves accessibility
+    \item Demonstrate practical applications of computer vision and machine learning in real-world accessibility challenges
+    \item Create a reusable, extensible framework for sign language recognition that can be adapted to other sign language systems
+    \item Enable researchers and developers to build upon this work for further advancements in gesture recognition
 \end{itemize}
 
 \subsection{Scope}
 
 The scope of this project includes:
 \begin{itemize}
-    \item Real-time hand gesture detection using MediaPipe Hand Landmarker
-    \item Classification of ISL gestures using trained machine learning models
-    \item Text-to-speech conversion for recognized gestures
-    \item Web-based dashboard using Streamlit for training and testing
-    \item Support for multiple gesture types (expandable)
-    \item Two-hand simultaneous gesture recognition
-    \item Gesture-to-character typing mode with auto-speech
-    \item Finger gesture history tracking for complex gestures
+    \item Real-time hand gesture detection using MediaPipe Hand Landmarker framework
+    \item Classification of Indian Sign Language gestures using trained machine learning models (CNN and classifiers)
+    \item Text-to-speech conversion for recognized gestures using offline speech synthesis
+    \item Web-based interactive dashboard using Streamlit for training new gestures, testing recognition, and viewing statistics
+    \item Support for multiple gesture types that is easily extensible for new gestures
+    \item Two-hand simultaneous gesture recognition with independent processing pipelines
+    \item Gesture-to-character typing mode with automatic speech output
+    \item Finger gesture history tracking for temporal gesture sequences
+    \item Frame-rate optimization for real-time processing (target 20+ FPS)
 \end{itemize}
 
 \subsection{Applicability}
 
 This system is applicable to:
 \begin{itemize}
-    \item Educational institutions for enhancing communication accessibility
-    \item Healthcare facilities for patient-provider communication
-    \item Public service centers and government offices
-    \item Corporate communication platforms
-    \item Personal assistive devices for hearing-impaired individuals
-    \item Further research in gesture recognition and assistive technology
+    \item \textbf{Educational Institutions}: Enhancing classroom communication for deaf and hard-of-hearing students
+    \item \textbf{Healthcare Facilities}: Improving patient-provider communication during medical consultations
+    \item \textbf{Public Service Centers}: Assisting hearing-impaired individuals in government and administrative interactions
+    \item \textbf{Corporate Communications}: Enabling inclusive communication in workplace environments
+    \item \textbf{Personal Assistive Devices}: Deployment as a standalone assistive technology for individuals
+    \item \textbf{Research Community}: Serving as a foundation for further research in gesture recognition, accessibility, and human-computer interaction
+    \item \textbf{Mobile and Web Applications}: Potential embedding into mobile apps and web platforms for broader accessibility
+\end{itemize}
+
+\section{Key Challenges Addressed}
+
+This project addresses several technical and practical challenges:
+
+\begin{itemize}
+    \item \textbf{Dataset Scarcity}: Created a custom training dataset in the absence of public ISL benchmarks
+    \item \textbf{Real-Time Processing}: Optimized pipeline for sub-100ms latency suitable for interactive communication
+    \item \textbf{Robustness}: Designed system to handle variations in lighting, hand size, position, and user-specific factors
+    \item \textbf{Extensibility}: Modular architecture enabling easy addition of new gesture classes
+    \item \textbf{User-Friendliness}: Intuitive dashboard interface requiring minimal technical expertise
+    \item \textbf{Multi-Hand Support}: Simultaneous recognition of gestures from both hands
+\end{itemize}
+
+\section{Achievements}
+
+The project work helped achieve the following technical and practical outcomes:
+
+\begin{itemize}
+    \item Built an end-to-end real-time hand-gesture recognition pipeline using MediaPipe Hand Landmark detection and OpenCV
+    \item Created and managed a custom Indian Sign Language dataset without relying on unavailable public resources
+    \item Implemented complete gesture classification pipeline incorporating data preprocessing, model training, and TensorFlow Lite inference
+    \item Designed and developed a Streamlit-based interactive dashboard supporting training, testing, typing, and data visualization workflows
+    \item Improved understanding of model optimization and deployment using TensorFlow Lite format for efficient inference
+    \item Strengthened software engineering practices through modular architecture, comprehensive testing, and documentation
+    \item Demonstrated practical application of computer vision and machine learning in accessibility domain
+\end{itemize}
+
+\section{Organization of Report}
+
+The remainder of this report is organized as follows:
+
+\begin{itemize}
+    \item \textbf{Chapter 2: SURVEY OF TECHNOLOGIES} explores the available technologies for gesture recognition and computer vision, presents comparative analysis, and explains the rationale behind the selected technology stack.
+    \item \textbf{Chapter 3: Requirements and Analysis} presents the problem definition, detailed requirement specifications, planning and scheduling information, hardware and software requirements, and conceptual models.
+    \item \textbf{Chapter 4: System Design} explains the module-level design, data design specifications, procedural design, system architecture, and visual diagrams.
+    \item \textbf{Chapter 5: Implementation and Testing} covers implementation strategy, important code snippets demonstrating key functionality, coding standards, efficiency considerations, and testing approaches.
+    \item \textbf{Chapter 6: Results and Discussion} provides comprehensive test reports, sample inputs/outputs, system observations, and user-level discussion with documentation.
+    \item \textbf{Chapter 7: Conclusions} summarizes project conclusions, system limitations, and recommendations for future work and improvements.
 \end{itemize}
 
 \newpage
@@ -133,17 +225,15 @@ This system is applicable to:
 \input{chapters/chapter5_pipeline}
 
 \newpage
-\input{chapters/chapter6_implementation}
-
-\newpage
 \input{chapters/chapter7_results}
 
 \newpage
-\input{chapters/chapter8_conclusion}
+\input{chapters/chapter7_conclusion}
 
 % Bibliography
 \newpage
 \bibliographystyle{plain}
+\nocite{*}
 \bibliography{references}
 
 % Appendix
@@ -159,10 +249,10 @@ Due to the unavailability of public Indian Sign Language datasets, we created ou
 \centering
 \begin{tabular}{|c|c|c|}
 \hline
-\textbf{Gesture} & \textbf{Image Count} & \textbf{Last Updated} \\
+\textbf{Gesture Type} & \textbf{Image Count} & \textbf{Last Updated} \\
 \hline
-Hello & 100 & 2026-02-04 \\
-Thumbs Up & 100 & 2026-02-04 \\
+Gesture Type 1 & 100+ & Recent \\
+Gesture Type 2 & 100+ & Recent \\
 \hline
 \end{tabular}
 \caption{Custom ISL Training Dataset}
@@ -191,31 +281,22 @@ Thumbs Up & 100 & 2026-02-04 \\
 
 \section{Installation}
 
-\begin{lstlisting}[language=bash]
-# Clone or download the project
-cd hand-sign
-
-# Create virtual environment
-python -m venv .venv
-
-# Activate virtual environment
-# On Windows:
-.venv\Scripts\activate
-# On Unix/MacOS:
-source .venv/bin/activate
-
-# Install dependencies
-pip install -r requirements.txt
-\end{lstlisting}
+\begin{enumerate}
+    \item Open a terminal in the project directory and change folder to \texttt{hand-sign}.
+    \item Create a virtual environment using \texttt{python -m venv .venv}.
+    \item Activate the environment:
+    \begin{itemize}
+        \item On Windows: \texttt{.venv\textbackslash Scripts\textbackslash activate}
+        \item On Unix/macOS: \texttt{source .venv/bin/activate}
+    \end{itemize}
+    \item Install dependencies using \texttt{pip install -r requirements.txt}.
+\end{enumerate}
 
 \section{Running the Application}
 
-\begin{lstlisting}[language=bash]
-# Start the Streamlit dashboard
-streamlit run enhanced_dashboard.py
-
-# Or run the command-line application
-python app.py
-\end{lstlisting}
+\begin{itemize}
+    \item Start dashboard mode with \texttt{streamlit run enhanced_dashboard.py}
+    \item Run command-line mode with \texttt{python app.py}
+\end{itemize}
 
 \end{document}

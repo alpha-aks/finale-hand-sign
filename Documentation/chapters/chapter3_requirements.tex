@@ -79,35 +79,79 @@ Documentation & Week 8 & Final Report, User Guide \\
 \caption{Project Timeline}
 \end{table}
 
+\subsection{Gantt Chart (Month-wise Project Journey)}
+
+\begin{table}[H]
+\centering
+\small
+\begin{tabular}{|p{4.2cm}|c|c|c|c|c|c|}
+\hline
+\textbf{Phase} & \textbf{July} & \textbf{August} & \textbf{September} & \textbf{October} & \textbf{November} & \textbf{December} \\
+\hline
+Requirement Analysis & X &  &  &  &  &  \\
+\hline
+Setup and Environment Configuration &  & X &  &  &  &  \\
+\hline
+Backend Development &  &  & X &  &  &  \\
+\hline
+Frontend Development &  &  &  & X &  &  \\
+\hline
+Integration and Testing &  &  &  &  & X &  \\
+\hline
+Deployment and Documentation &  &  &  &  &  & X \\
+\hline
+\end{tabular}
+\caption{Gantt Chart for Project Journey (July to December)}
+\end{table}
+
 \section{Software and Hardware Requirements}
 
 \subsection{Software Requirements}
 
-\begin{itemize}
-    \item \textbf{Operating System}: Windows 10+, Ubuntu 18.04+, or macOS 10.13+
-    \item \textbf{Python}: Version 3.8 or higher
-    \item \textbf{Package Manager}: pip or conda
-    \item \textbf{IDE}: Visual Studio Code or PyCharm
-\end{itemize}
+\begin{table}[H]
+\centering
+\begin{tabular}{|p{3.2cm}|p{4cm}|p{2.4cm}|p{4.2cm}|}
+\hline
+\textbf{Software Component} & \textbf{Minimum Requirement} & \textbf{Recommended} & \textbf{Purpose} \\
+\hline
+Operating System & Windows 10 / Ubuntu 18.04 / macOS 10.13 & Windows 11 / Ubuntu 22.04 / macOS 12+ & Application runtime and device management \\
+\hline
+Python & Python 3.8+ & Python 3.10+ & Core language for model, CV, and dashboard modules \\
+\hline
+Package Manager & pip / conda & pip (latest) + virtual environment & Dependency installation and environment isolation \\
+\hline
+IDE/Editor & Any text editor & VS Code / PyCharm & Development, debugging, and code maintenance \\
+\hline
+Libraries & OpenCV, MediaPipe, TensorFlow, Streamlit, pyttsx3 & Latest stable releases & Vision pipeline, inference, UI, and speech output \\
+\hline
+Version Control & Git (optional) & Git with remote repository & Source tracking, backup, and collaboration \\
+\hline
+\end{tabular}
+\caption{Software Requirements Specification}
+\end{table}
 
 \subsection{Hardware Requirements}
 
 \begin{table}[H]
 \centering
-\begin{tabular}{|c|c|}
+\begin{tabular}{|p{3.2cm}|p{3.8cm}|p{3.2cm}|p{3.4cm}|}
 \hline
-\textbf{Component} & \textbf{Specification} \\
+\textbf{Component} & \textbf{Minimum Specification} & \textbf{Recommended} & \textbf{Purpose} \\
 \hline
-Processor & Intel i5/AMD Ryzen 5 or better \\
+Processor & Intel i5 / AMD Ryzen 5 & Intel i7 / Ryzen 7 or better & Real-time frame processing and model inference \\
 \hline
-RAM & Minimum 4GB, Recommended 8GB+ \\
+RAM & 4 GB & 8 GB or above & Smooth multi-module execution \\
 \hline
-Storage & 2GB free space for dependencies \\
+Storage & 2 GB free & 10 GB+ SSD free & Dependencies, model files, logs, and dataset growth \\
 \hline
-Webcam & 640x480 resolution minimum \\
+Webcam & 640x480 resolution & 720p or 1080p USB webcam & Gesture capture and landmark detection \\
+\hline
+Display & 1366x768 & Full HD (1920x1080) & Better dashboard usability and visualization \\
+\hline
+Audio Output & Basic speaker/headphone & Noise-free speaker/headset & Text-to-speech feedback \\
 \hline
 \end{tabular}
-\caption{Hardware Specifications}
+\caption{Hardware Requirements Specification}
 \end{table}
 
 \section{Preliminary Product Description}
@@ -151,38 +195,213 @@ The Indian Sign Language (ISL) Detection System is a desktop application consist
 \begin{itemize}
     \item \textbf{Positive Factors}
     \begin{itemize}
-        \item MediaPipe provides robust hand detection
-        \item TensorFlow/Keras enable fast model development
-        \item Streamlit simplifies UI development
-        \item Python ecosystem is mature and well-supported
+        \item MediaPipe provides robust hand detection with proven accuracy
+        \item TensorFlow/Keras enable fast model development and iteration
+        \item Streamlit simplifies web UI development without frontend expertise
+        \item Python ecosystem is mature, well-documented, and widely supported
+        \item TensorFlow Lite enables efficient model deployment on various devices
     \end{itemize}
     
     \item \textbf{Challenges}
     \begin{itemize}
-        \item Real-time processing requires optimization
-        \item Limited availability of ISL datasets
-        \item Complex hand gestures with similar features
+        \item Real-time video processing at 30+ FPS requires careful optimization
+        \item Limited availability of public Indian Sign Language datasets
+        \item Complex hand gestures with similar hand shapes require careful feature engineering
+        \item Handling environmental variability (lighting, backgrounds, hand sizes)
     \end{itemize}
 \end{itemize}
 
 \subsection{Economic Feasibility}
 
 \begin{itemize}
-    \item All tools and libraries are open-source (zero licensing cost)
-    \item Minimal hardware investment required
-    \item Standard webcam suitable for implementation
-    \item Development uses freely available IDEs and tools
+    \item All tools, libraries, and frameworks used are completely open-source with zero licensing cost
+    \item Minimal hardware investment required—standard consumer laptops are sufficient
+    \item Standard USB webcam (< \$30) suitable for implementation
+    \item Development uses freely available IDEs, compilers, and tools (VS Code, Python)
+    \item No cloud subscriptions or paid services required for core functionality
 \end{itemize}
 
 \subsection{Operational Feasibility}
 
 \begin{itemize}
     \item System is designed for end-users with minimal technical knowledge
-    \item Simple installation using pip package manager
-    \item Web-based dashboard provides intuitive interface
-    \item Can be extended to support new gestures incrementally
+    \item Simple one-command installation using pip package manager and bash scripts
+    \item Web-based Streamlit dashboard provides intuitive, self-explanatory interface
+    \item Can be extended to support new gestures through dashboard without code modifications
+    \item Minimal training required for users to operate the system
+    \item System documentation and inline code comments support long-term maintenance
 \end{itemize}
 
 \subsection{Conclusion}
 
-All feasibility aspects are favorable. The project is technically sound, economically viable, and operationally feasible with proper planning and execution.
+All feasibility aspects are favorable. The project is technically sound with proven component technologies, economically viable with zero-cost open-source stack, and operationally feasible with proper planning and modular design.
+
+\section{Detailed Use Cases and Scenarios}
+
+\subsection{Primary Use Case: Real-Time Gesture Recognition}
+
+\begin{itemize}
+    \item \textbf{Actor}: Hearing-impaired user
+    \item \textbf{Precondition}: System is running, camera feed is active
+    \item \textbf{Main Flow}:
+    \begin{enumerate}
+        \item User makes a trained gesture in front of the camera
+        \item System detects hand landmarks in real-time
+        \item Landmarks are preprocessed and normalized
+        \item Gesture is classified using the trained model
+        \item Recognized gesture text is displayed on screen
+        \item Gesture is spoken aloud using text-to-speech
+        \item Gesture appears in history log for reference
+    \end{enumerate}
+    \item \textbf{Postcondition}: Gesture is successfully recognized and communicated
+\end{itemize}
+
+\subsection{Secondary Use Case: Training New Gestures}
+
+\begin{itemize}
+    \item \textbf{Actor}: System administrator or power user
+    \item \textbf{Precondition}: Streamlit dashboard is open
+    \item \textbf{Main Flow}:
+    \begin{enumerate}
+        \item User selects "Train New Gesture" mode from dashboard
+        \item User enters name for new gesture
+        \item System captures images of user performing the gesture multiple times
+        \item User provides images via webcam and dashboard upload
+        \item Images are stored in organized directory structure
+        \item Model retraining is triggered
+        \item New gesture is added to classifier vocabulary
+        \item System is restarted to load updated model
+    \end{enumerate}
+    \item \textbf{Postcondition}: New gesture is integrated and recognized by system
+\end{itemize}
+
+\subsection{Tertiary Use Case: Typing Mode}
+
+\begin{itemize}
+    \item \textbf{Actor}: Hearing-impaired user wanting to type text
+    \item \textbf{Precondition}: System is in typing mode, gesture-to-character mapping is loaded
+    \item \textbf{Main Flow}:
+    \begin{enumerate}
+        \item User makes gesture corresponding to desired character
+        \item System recognizes gesture and maps to character
+        \item Character is appended to text buffer on screen
+        \item Character is pronounced individually via TTS
+        \item User continues gesturing to spell out complete word
+        \item User makes special gesture to complete word and trigger full word pronunciation
+    \end{enumerate}
+    \item \textbf{Postcondition}: Complete word or sentence has been typed and spoken
+\end{itemize}
+
+\section{System Constraints and Limitations}
+
+\subsection{Environmental Constraints}
+
+\begin{itemize}
+    \item \textbf{Lighting Requirements}: System performs best in well-lit environments (> 300 lux). Performance degrades in low-light or shadow conditions.
+    \item \textbf{Background Requirements}: Complex or moving backgrounds may reduce landmark detection accuracy. Static, non-distracting backgrounds are preferred.
+    \item \textbf{Distance Requirements}: Hand should be 30-100 cm from camera for optimal detection.
+    \item \textbf{Frame Rate}: Minimum 15 FPS camera recommended; processing assumes 30 FPS input for smooth temporal tracking.
+\end{itemize}
+
+\subsection{Technical Constraints}
+
+\begin{itemize}
+    \item \textbf{Gesture Vocabulary Limit}: Current model supports up to 20-30 distinct gestures with practical training overhead.
+    \item \textbf{Hand Occlusion}: Partially hidden or overlapped hands reduce landmark accuracy.
+    \item \textbf{Multi-Hand Limitation}: Current implementation handles up to 2 hands simultaneously; more than 2 hands not supported.
+    \item \textbf{Processing Latency}: ~100ms latency between gesture and text output; not suitable for ultra-real-time applications.
+    \item \textbf{Memory Usage}: Requires 300-500 MB RAM for all components; not suitable for very low-resource systems.
+\end{itemize}
+
+\subsection{User Constraint}
+
+\begin{itemize}
+    \item \textbf{Gesture Consistency}: Users must perform gestures with reasonable consistency to achieve high recognition rates.
+    \item \textbf{Hand Position}: Hands must be visible and unobstructed to camera for detection to work.
+    \item \textbf{Gesture Vocabulary}: Only pre-trained gestures will be recognized; spontaneous or untrained gestures will result in "Unknown" classification.
+\end{itemize}
+
+\section{Assumptions and Dependencies}
+
+\subsection{Assumptions}
+
+\begin{itemize}
+    \item System assumes internet availability is \textbf{not} required for core recognition functionality (all models are loaded locally)
+    \item Users are assumed to perform gestures deliberately and consciously (not unintentional hand movements)
+    \item Training data is assumed to be representative of actual usage contexts
+    \item Audio output hardware (speakers) is assumed to be available for text-to-speech
+    \item Users are assumed to have basic computer literacy (able to start applications and use dashboard)
+\end{itemize}
+
+\subsection{Dependencies}
+
+\begin{itemize}
+    \item \textbf{External Libraries}: All dependencies (MediaPipe, TensorFlow, OpenCV, Streamlit, pyttsx3) must be installed and functioning
+    \item \textbf{Model Files}: Pre-trained TFLite model files must be present in correct directories
+    \item \textbf{Label Files}: CSV files mapping gesture class indices to names must be available
+    \item \textbf{Python Version}: Python 3.8+ required for language features and library compatibility
+    \item \textbf{Operating System}: Webcam drivers and audio subsystem must be functional
+\end{itemize}
+
+\section{Data Flow and Information Requirements}
+
+\subsection{Input Data}
+
+\begin{itemize}
+    \item \textbf{Video Stream}: Continuous RGB frames from webcam (640x480, 30 FPS)
+    \item \textbf{Landmark Coordinates}: 21 hand landmarks per hand (x, y, z, confidence) from MediaPipe
+    \item \textbf{Preprocessed Features}: Normalized 42-element feature vector per hand
+    \item \textbf{Training Data}: Labeled gesture images for model training
+\end{itemize}
+
+\subsection{Processing Data}
+
+\begin{itemize}
+    \item \textbf{Feature Vector}: Normalized landmark coordinates stored as 42-element numpy arrays
+    \item \textbf{Model State}: Intermediate activations in neural network layers during inference
+    \item \textbf{History Buffer}: Deque of recent gesture predictions for temporal filtering
+\end{itemize}
+
+\subsection{Output Data}
+
+\begin{itemize}
+    \item \textbf{Gesture Label}: Recognized gesture name as string
+    \item \textbf{Confidence Score}: Probability of predicted gesture class
+    \item \textbf{Text Output}: Displayed gesture name on screen
+    \item \textbf{Audio Output}: Synthesized speech output via speakers
+    \item \textbf{Gesture History}: Log of recognized gestures with timestamps
+\end{itemize}
+
+\section{Security and Safety Requirements}
+
+\subsection{Data Privacy}
+
+\begin{itemize}
+    \item All processing occurs locally on user's machine; no data sent to external servers
+    \item Training data stored locally; user has full control over dataset location
+    \item No personal information is collected or logged
+    \item Video frames are processed and discarded; not stored permanently
+\end{itemize}
+
+\subsection{System Safety}
+
+\begin{itemize}
+    \item Error handling for missing model files with graceful degradation
+    \item Webcam access validation to prevent unauthorized camera usage
+    \item Non-blocking speech output to prevent UI freeze
+    \item Memory management to prevent buffer overflows or resource exhaustion
+\end{itemize}
+
+\section{Acceptance Criteria}
+
+The system is considered acceptable if it meets the following criteria:
+
+\begin{enumerate}
+    \item \textbf{Accuracy}: Achieves $\geq 90\%$ recognition accuracy on trained gestures in controlled lighting conditions
+    \item \textbf{Performance}: Processes video at $\geq 25$ FPS on standard laptop hardware
+    \item \textbf{Usability}: Dashboard interface can be used by non-technical users without training
+    \item \textbf{Reliability}: System runs for $\geq 2$ hours continuously without crashes
+    \item \textbf{Extensibility}: New gestures can be added and integrated with $< 10$ minutes manual work
+    \item \textbf{Documentation}: Complete API documentation and user guide are provided
+    \item \textbf{Cross-Platform}: Tested and functional on Windows 10+, Ubuntu 20.04+, and macOS 10.15+
+\end{enumerate}
